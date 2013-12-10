@@ -1,13 +1,17 @@
 #!/usr/bin/make -f
 
 PACKAGE = libpixman-1-0
-SHLIBS  = 0.21.6
+SHLIBS  = 0.25.2
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 # Disable Gtk+ autodetection:
 override_dh_auto_configure:
-	dh_auto_configure -- --disable-gtk \
+	# also avoid loongson2f optimizations on mipsel, see 0.26.0-3
+	# changelog entry:
+	LS_CFLAGS=" " dh_auto_configure -- --disable-gtk \
+	  --disable-silent-rules \
+	  --disable-arm-iwmmxt \
 	  --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH)
 
 # Install in debian/tmp to retain control through dh_install:
