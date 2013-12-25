@@ -1,3 +1,9 @@
+pixman (0.24.4-1ubuntu0.1pexip1) pexip; urgency=low
+
+  * Prepare Pexip packaging
+
+ -- John-Mark Bell <jmb@pexip.com>  Wed, 25 Dec 2013 02:14:48 +0000
+
 pixman (0.24.4-1ubuntu0.1) precise-security; urgency=low
 
   * SECURITY UPDATE: Fix underflow when bottom is close to MIN_INT
