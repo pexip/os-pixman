@@ -1,17 +1,100 @@
-pixman (0.24.4-1ubuntu0.1pexip1) pexip; urgency=low
+pixman (0.30.2-1ubuntu0.0.0.0.1pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging
 
- -- John-Mark Bell <jmb@pexip.com>  Wed, 25 Dec 2013 02:14:48 +0000
+ -- John-Mark Bell <jmb@pexip.com>  Sun, 08 Jun 2014 11:20:12 +0100
 
-pixman (0.24.4-1ubuntu0.1) precise-security; urgency=low
+pixman (0.30.2-1ubuntu0.0.0.0.1) precise-proposed; urgency=low
+
+  * Copy saucy package back to precise. (LP: #1253041)
+
+ -- Maarten Lankhorst <maarten.lankhorst@ubuntu.com>  Tue, 10 Dec 2013 13:26:08 +0100
+
+pixman (0.30.2-1ubuntu0.1) saucy-security; urgency=low
 
   * SECURITY UPDATE: Fix underflow when bottom is close to MIN_INT
     - debian/patches/security-lp1197921.patch: verify (t)->bottom > (t)->top)
     - LP: #1197921
     - CVE-YYYY-NNNN
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 03 Dec 2013 12:16:20 -0600
+ -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 03 Dec 2013 12:07:19 -0600
+
+pixman (0.30.2-1) sid; urgency=low
+
+  * New upstream release
+    - includes big-endian matrix-test fix
+  * Increase alpha-loop test timeout some more.
+
+ -- Julien Cristau <jcristau@debian.org>  Tue, 13 Aug 2013 12:08:18 +0200
+
+pixman (0.30.0-3) sid; urgency=low
+
+  * Increase timeout for the alpha-loop test.  That will hopefully let it pass
+    on the mips buildd.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 03 Aug 2013 10:24:29 +0200
+
+pixman (0.30.0-2) sid; urgency=low
+
+  * Disable silent Makefile rules.
+  * Disable arm iwmmxt fast paths.  It breaks the build.
+  * Fix matrix-test on big endian (patch from Siarhei Siamashka).
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 27 Jul 2013 21:40:48 +0200
+
+pixman (0.30.0-1) sid; urgency=low
+
+  [ Maarten Lankhorst, Cyril Brulebois, Julien Cristau ]
+  * New upstream release.
+
+ -- Julien Cristau <jcristau@debian.org>  Fri, 26 Jul 2013 14:58:25 +0200
+
+pixman (0.26.0-4) sid; urgency=high
+
+  * Fix for CVE-2013-1591 (stack-based buffer overflow), cherry-picked from
+    0.27.4 (closes: #700308).
+
+ -- Julien Cristau <jcristau@debian.org>  Mon, 18 Feb 2013 19:58:33 +0100
+
+pixman (0.26.0-3) unstable; urgency=low
+
+  * Pass LS_CFLAGS=" " to configure to prevent -march=loongson2f from
+    being passed to gcc, which would break on loongson2e (see fdo bug
+    #51451). This fixes the test suite failures on mipsel, and should
+    avoid any crashes depending on user systems.
+
+ -- Cyril Brulebois <kibi@debian.org>  Wed, 27 Jun 2012 12:11:54 +0200
+
+pixman (0.26.0-2) unstable; urgency=low
+
+  * Cherry-pick from upstream master branch to fix FTBFS on *i386:
+    - da6193b1fc “mmx: add missing _mm_empty calls”
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 15 Jun 2012 01:25:20 +0200
+
+pixman (0.26.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 15 Jun 2012 00:16:47 +0200
+
+pixman (0.25.6-1) experimental; urgency=low
+
+  * New upstream release candidate.
+  * Remove demos/parrot.jpg before building the source package to avoid
+    “binary file contents changed” until it's shipped in the upstream
+    tarball.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sun, 20 May 2012 17:56:35 +0200
+
+pixman (0.25.2-1) experimental; urgency=low
+
+  * New upstream release candidate.
+  * Add new symbols and bump shlibs accordingly:
+    - pixman_region32_clear
+    - pixman_region_clear
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 09 Mar 2012 13:17:16 +0100
 
 pixman (0.24.4-1) unstable; urgency=low
 
