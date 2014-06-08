@@ -15,6 +15,9 @@
 /* Define to 1 if we have <fenv.h> */
 #undef HAVE_FENV_H
 
+/* Whether the tool chain supports __float128 */
+#undef HAVE_FLOAT128
+
 /* Define to 1 if you have the `getisax' function. */
 #undef HAVE_GETISAX
 
@@ -75,6 +78,10 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
 /* Name of package */
 #undef PACKAGE
 
@@ -90,6 +97,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -102,11 +112,11 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* The compiler supported TLS storage class */
+#undef TLS
+
 /* Whether the tool chain supports __attribute__((constructor)) */
 #undef TOOLCHAIN_SUPPORTS_ATTRIBUTE_CONSTRUCTOR
-
-/* Whether the tool chain supports __thread */
-#undef TOOLCHAIN_SUPPORTS__THREAD
 
 /* use ARM IWMMXT compiler intrinsics */
 #undef USE_ARM_IWMMXT
@@ -119,6 +129,12 @@
 
 /* use GNU-style inline assembler */
 #undef USE_GCC_INLINE_ASM
+
+/* use Loongson Multimedia Instructions */
+#undef USE_LOONGSON_MMI
+
+/* use MIPS DSPr2 assembly optimizations */
+#undef USE_MIPS_DSPR2
 
 /* use OpenMP in the test suite */
 #undef USE_OPENMP
@@ -152,3 +168,6 @@
 #ifndef __cplusplus
 #undef inline
 #endif
+
+/* Define to sqrt if you do not have the `sqrtf' function. */
+#undef sqrtf
