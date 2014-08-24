@@ -1,33 +1,38 @@
-pixman (0.30.2-1ubuntu0.0.0.0.3) precise-security; urgency=medium
+pixman (0.32.6-3) sid; urgency=medium
 
-  * SECURITY UPDATE: denial of service and possible code execution via
-    overflow in create_bits
-    - debian/patches/CVE-2014-9766.patch: cast to size_t in
-      pixman/pixman-bits-image.c.
-    - CVE-2014-9766
+  [ intrigeri ]
+  * Enable hardening build flags with dpkg-buildflags.
 
- -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 02 Mar 2016 16:13:35 -0500
+ -- Julien Cristau <jcristau@debian.org>  Sat, 23 Aug 2014 22:16:40 -0700
 
-pixman (0.30.2-1ubuntu0.0.0.0.2) precise-security; urgency=medium
+pixman (0.32.6-2) sid; urgency=medium
 
-  * No change rebuild in the security pocket
+  [ Julien Cristau ]
+  * Disable vmx on ppc64el (closes: #745547).  Thanks, Breno Leitao!
 
- -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Sat, 06 Dec 2014 10:45:18 -0500
+ -- Cyril Brulebois <kibi@debian.org>  Mon, 18 Aug 2014 22:50:39 +0200
 
-pixman (0.30.2-1ubuntu0.0.0.0.1) precise-proposed; urgency=low
+pixman (0.32.6-1) sid; urgency=medium
 
-  * Copy saucy package back to precise. (LP: #1253041)
+  * New upstream release.
+  * Bump debhelper compat level to 9.
+  * Remove Cyril from Uploaders.
 
- -- Maarten Lankhorst <maarten.lankhorst@ubuntu.com>  Tue, 10 Dec 2013 13:26:08 +0100
+ -- Julien Cristau <jcristau@debian.org>  Sun, 13 Jul 2014 16:31:06 +0200
 
-pixman (0.30.2-1ubuntu0.1) saucy-security; urgency=low
+pixman (0.32.4-1) sid; urgency=low
 
-  * SECURITY UPDATE: Fix underflow when bottom is close to MIN_INT
-    - debian/patches/security-lp1197921.patch: verify (t)->bottom > (t)->top)
-    - LP: #1197921
-    - CVE-YYYY-NNNN
+  * New upstream release.
 
- -- Jamie Strandboge <jamie@ubuntu.com>  Tue, 03 Dec 2013 12:07:19 -0600
+ -- Julien Cristau <jcristau@debian.org>  Tue, 17 Dec 2013 22:04:15 +0100
+
+pixman (0.30.2-2) sid; urgency=low
+
+  * Cherry-pick upstream bigfixes for fixing a crash when rendering
+    invalid trapezoids. (LP: #1197921)
+    Addresses CVE-2013-6425.
+
+ -- Maarten Lankhorst <maarten.lankhorst@ubuntu.com>  Mon, 18 Nov 2013 15:08:56 +0100
 
 pixman (0.30.2-1) sid; urgency=low
 
