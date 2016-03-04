@@ -1,3 +1,25 @@
+pixman (0.30.2-1ubuntu0.0.0.0.3pexip1) pexip; urgency=low
+
+  * New upstream release
+
+ -- John-Mark Bell <jmb@pexip.com>  Fri, 04 Mar 2016 12:16:03 +0000
+
+pixman (0.30.2-1ubuntu0.0.0.0.3) precise-security; urgency=medium
+
+  * SECURITY UPDATE: denial of service and possible code execution via
+    overflow in create_bits
+    - debian/patches/CVE-2014-9766.patch: cast to size_t in
+      pixman/pixman-bits-image.c.
+    - CVE-2014-9766
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 02 Mar 2016 16:13:35 -0500
+
+pixman (0.30.2-1ubuntu0.0.0.0.2) precise-security; urgency=medium
+
+  * No change rebuild in the security pocket
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Sat, 06 Dec 2014 10:45:18 -0500
+
 pixman (0.30.2-1ubuntu0.0.0.0.1pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging
