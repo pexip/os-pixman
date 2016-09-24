@@ -1,3 +1,48 @@
+pixman (0.34.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release (no actual changes)
+  * Use https URL in debian/watch.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 24 Sep 2016 13:25:16 +0200
+
+pixman (0.33.6-1) unstable; urgency=medium
+
+  * New upstream release candidate.
+  * Add myself to Uploaders.
+
+ -- Andreas Boll <andreas.boll.dev@gmail.com>  Thu, 14 Jan 2016 13:46:28 +0100
+
+pixman (0.33.4-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release candidate.
+
+ -- Andreas Boll <andreas.boll.dev@gmail.com>  Wed, 04 Nov 2015 13:26:18 +0100
+
+pixman (0.33.2-2) sid; urgency=medium
+
+  * Run tests with VERBOSE=1.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 12 Sep 2015 20:31:06 +0200
+
+pixman (0.33.2-1) sid; urgency=medium
+
+  [ Andreas Boll ]
+  * New upstream release candidate.
+  * Enable vmx on ppc64el (closes: #786345).
+  * Update Vcs-* fields.
+  * Add upstream url.
+  * Drop XC- prefix from Package-Type field.
+  * Bump standards version to 3.9.6.
+
+  [ intrigeri ]
+  * Simplify hardening build flags handling (closes: #760100).
+    Thanks to Simon Ruderich <simon@ruderich.org> for the patch.
+  * Enable all hardening build flags. Thanks to Simon Ruderich too.
+
+ -- Julien Cristau <jcristau@debian.org>  Sat, 12 Sep 2015 13:08:02 +0200
+
 pixman (0.32.6-3) sid; urgency=medium
 
   [ intrigeri ]
