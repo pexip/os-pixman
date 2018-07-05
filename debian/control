@@ -11,7 +11,7 @@ Build-Depends:
 Standards-Version: 3.9.2
 Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/pixman
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/pixman.git
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ jessie
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
 
 Package: libpixman-1-0
 Section: libs
