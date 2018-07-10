@@ -3,14 +3,16 @@ Section: devel
 Priority: optional
 Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
+XSBC-Pexip-Original-Uploaders: Andreas Boll <andreas.boll.dev@gmail.com>
 Build-Depends:
  debhelper (>= 9),
  dh-autoreconf,
  pkg-config,
  quilt,
-Standards-Version: 3.9.2
-Vcs-Git: git://git.debian.org/git/pkg-xorg/lib/pixman
-Vcs-Browser: http://git.debian.org/?p=pkg-xorg/lib/pixman.git
+Standards-Version: 3.9.6
+Vcs-Git: https://anonscm.debian.org/git/pkg-xorg/lib/pixman.git
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-xorg/lib/pixman.git
+Homepage: http://pixman.org/
 XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
 
 Package: libpixman-1-0
@@ -29,7 +31,7 @@ Description: pixel-manipulation library for X and cairo
 
 Package: libpixman-1-0-udeb
 Section: debian-installer
-XC-Package-Type: udeb
+Package-Type: udeb
 Architecture: any
 Depends:
  ${shlibs:Depends},

@@ -3,7 +3,7 @@
 PACKAGE = libpixman-1-0
 SHLIBS  = 0.25.2
 
-export DEB_BUILD_MAINT_OPTIONS = hardening=+bindnow
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 # Disable Gtk+ autodetection:
 override_dh_auto_configure:
@@ -11,8 +11,7 @@ override_dh_auto_configure:
 	# changelog entry:
 	LS_CFLAGS=" " dh_auto_configure -- --disable-gtk \
 	  --disable-silent-rules \
-	  --disable-arm-iwmmxt \
-	  $(shell dpkg-buildflags --export=configure)
+	  --disable-arm-iwmmxt
 
 # Install in debian/tmp to retain control through dh_install:
 override_dh_auto_install:
@@ -31,6 +30,9 @@ override_dh_strip:
 # Shlibs:
 override_dh_makeshlibs:
 	dh_makeshlibs -p$(PACKAGE) --add-udeb $(PACKAGE)-udeb -V"$(PACKAGE) (>= $(SHLIBS))" -- -c4
+
+override_dh_auto_test:
+	dh_auto_test -- VERBOSE=1
 
 %:
 	dh $@ --with quilt,autoreconf --builddirectory=build/ --parallel

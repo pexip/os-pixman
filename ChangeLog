@@ -1,32 +1,2177 @@
-commit 87eea99e443b389c978cf37efc52788bf03a0ee0
-Author: Søren Sandmann Pedersen <ssp@redhat.com>
-Date:   Sat Jul 5 18:55:43 2014 -0400
+commit 1727aa4ab60a594cbb1cc1bdaa270b7dfad21f06
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jan 31 16:39:23 2016 +0200
 
-    Pre-release version bump to 0.32.6
+    Pre-release version bump to 0.34.0
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
 
-commit 9f18ea3483dbdce88134e6cc52bb219303e53729
+commit 0e72e780865196e4edd720148d9a99704cd114b5
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Tue Dec 22 15:55:32 2015 +0200
+
+    Post-release version bump to 0.33.7
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 65f35270e4531621bd2e1ee5cdb31c56c3051c43
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Tue Dec 22 15:30:10 2015 +0200
+
+    Pre-release version bump to 0.33.6
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit a566f627dbd6ea8f2cba70a446e62caaa2ecbd26
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Tue Dec 15 14:53:18 2015 +0200
+
+    configura.ac: fix test for SSE2 & SSSE3 assembler support
+    
+    This patch modifies the SSE2 & SSSE3 tests in configure.ac to use a
+    global variable to initialize vector variables. In addition, we now
+    return the value of the computation instead of 0.
+    
+    This is done so gcc 4.9 (and lower) won't optimize the SSE assembly
+    instructions (when using -O1 and higher), because then the configure test
+    might incorrectly pass even though the assembler doesn't support the
+    SSE instructions (the test will pass because the compiler does support
+    the intrinsics).
+    
+    v2: instead of using volatile, use a global variable as input
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit d24b415f3e2753a588759d028b811e1ce38fea6c
+Author: Andrea Canciani <ranma42@gmail.com>
+Date:   Sun Oct 11 09:45:57 2015 +0200
+
+    mmx: Improve detection of support for "K" constraint
+    
+    Older versions of clang emitted an error on the "K" constraint, but at
+    least since version 3.7 it is supported. Just like gcc, this
+    constraint is only allowed for constants, but apparently clang
+    requires them to be known before inlining.
+    
+    Using the macro definition _mm_shuffle_pi16(A, N) ensures that the "K"
+    constraint is always applied to a literal constant, independently from
+    the compiler optimizations and allows building pixman-mmx on modern
+    clang.
+    
+    Reviewed-by: Matt Turner <mattst88@gmail.com>
+    Signed-off-by: Andrea Canciani <ranma42@gmail.com>
+
+commit 312e381523662aacc2f0ea90eb9ae0634ac5b327
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Wed Nov 18 14:16:24 2015 -0800
+
+    Revert "mmx: Use MMX2 intrinsics from xmmintrin.h directly."
+    
+    This reverts commit 7de61d8d14e84623b6fa46506eb74f938287f536.
+    
+    Newer versions of gcc allow inclusion of xmmintrin.h without -msse, but
+    still won't allow usage of the intrinsics.
+    
+    Bugzilla: https://bugs.gentoo.org/show_bug.cgi?id=564024
+
+commit 3a50806cbeb713b7d1d07a06c6b503d9e43aefe8
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Fri Oct 23 18:33:55 2015 +0300
+
+    Post-release version bump to 0.33.5
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit fa71d08a81c9bf3f2366ee45474ff868d9e10b8e
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Fri Oct 23 17:58:49 2015 +0300
+
+    Pre-release version bump to 0.33.4
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 9728241bd098bc4260e6cd83997dfecc64adc356
+Author: Andrea Canciani <ranma42@gmail.com>
+Date:   Tue Oct 13 13:35:59 2015 +0200
+
+    test: Fix fence-image-self-test on Mac
+    
+    On MacOS X, according to the manpage of mprotect(), "When a program
+    violates the protections of a page, it gets a SIGBUS or SIGSEGV
+    signal.", but fence-image-self-test was only accepting a SIGSEGV as
+    notification of invalid access.
+    
+    Fixes fence-image-self-test
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 7de61d8d14e84623b6fa46506eb74f938287f536
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Sun Oct 11 14:44:46 2015 -0700
+
+    mmx: Use MMX2 intrinsics from xmmintrin.h directly.
+    
+    We had lots of hacks to handle the inability to include xmmintrin.h
+    without compiling with -msse (lest SSE instructions be used in
+    pixman-mmx.c). Some recent version of gcc relaxed this restriction.
+    
+    Change configure.ac to test that xmmintrin.h can be included and that we
+    can use some intrinsics from it, and remove the work-around code from
+    pixman-mmx.c.
+    
+    Evidently allows gcc 4.9.3 to optimize better as well:
+    
+       text	   data	    bss	    dec	    hex	filename
+     657078	  30848	    680	 688606	  a81de	libpixman-1.so.0.33.3 before
+     656710	  30848	    680	 688238	  a806e	libpixman-1.so.0.33.3 after
+    
+    Reviewed-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Tested-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Signed-off-by: Matt Turner <mattst88@gmail.com>
+
+commit 90e62c086766afffd289a321c7de8ea4b5cac87d
 Author: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-Date:   Fri Mar 7 06:39:42 2014 +0200
+Date:   Fri Sep 4 15:39:00 2015 +0300
 
-    configure.ac: Check if the compiler supports GCC vector extensions
+    vmx: implement fast path vmx_composite_over_n_8888
     
-    The Intel Compiler 14.0.0 claims version GCC 4.7.3 compatibility
-    via __GNUC__/__GNUC__MINOR__ macros, but does not provide the same
-    level of GCC vector extensions support as the original GCC compiler:
-        http://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
+    Running "lowlevel-blt-bench over_n_8888" on Playstation3 3.2GHz,
+    Gentoo ppc (32-bit userland) gave the following results:
     
-    Which results in the following compilation failure:
+    before:  over_n_8888 =  L1: 147.47  L2: 205.86  M:121.07
+    after:   over_n_8888 =  L1: 287.27  L2: 261.09  M:133.48
     
-    In file included from ../test/utils.h(7),
-                     from ../test/utils.c(3):
-    ../test/utils-prng.h(138): error: expression must have integral type
-          uint32x4 e = x->a - ((x->b << 27) + (x->b >> (32 - 27)));
-                                ^
+    Cairo non-trimmed benchmarks on POWER8, 3.4GHz 8 Cores:
     
-    The problem is fixed by doing a special check in configure for
-    this feature.
+    ocitysmap          659.69  -> 611.71   :  1.08x speedup
+    xfce4-terminal-a1  2725.22 -> 2547.47  :  1.07x speedup
+    
+    Signed-off-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
 
-commit 50d7b5fa8ea2ae119f35c20ab0dd0413d5103cbb
+commit 2876d8d3dd6a71cb9eb3ac93e5b9c18b71a452da
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Fri Sep 4 03:09:20 2015 +0100
+
+    affine-bench: remove 8e margin from COVER area
+    
+    Patch "Remove the 8e extra safety margin in COVER_CLIP analysis" reduced
+    the required image area for setting the COVER flags in
+    pixman.c:analyze_extent(). Do the same reduction in affine-bench.
+    
+    Leaving the old calculations in place would be very confusing for anyone
+    reading the code.
+    
+    Also add a comment that explains how affine-bench wants to hit the COVER
+    paths. This explains why the intricate extent calculations are copied
+    from pixman.c.
+    
+    [Pekka: split patch, change comments, write commit message]
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 0e2e9751282b19280c92be4a80c5ae476bae0ce4
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Fri Sep 4 03:09:20 2015 +0100
+
+    Remove the 8e extra safety margin in COVER_CLIP analysis
+    
+    As discussed in
+    http://lists.freedesktop.org/archives/pixman/2015-August/003905.html
+    
+    the 8 * pixman_fixed_e (8e) adjustment which was applied to the transformed
+    coordinates is a legacy of rounding errors which used to occur in old
+    versions of Pixman, but which no longer apply. For any affine transform,
+    you are now guaranteed to get the same result by transforming the upper
+    coordinate as though you transform the lower coordinate and add (size-1)
+    steps of the increment in source coordinate space. No projective
+    transform routines use the COVER_CLIP flags, so they cannot be affected.
+    
+    Proof by Siarhei Siamashka:
+    
+    Let's take a look at the following affine transformation matrix (with 16.16
+    fixed point values) and two vectors:
+    
+             | a   b     c    |
+    M      = | d   e     f    |
+             | 0   0  0x10000 |
+    
+             |  x_dst  |
+    P     =  |  y_dst  |
+             | 0x10000 |
+    
+             | 0x10000 |
+    ONE_X  = |    0    |
+             |    0    |
+    
+    The current matrix multiplication code does the following calculations:
+    
+                 | (a * x_dst + b * y_dst + 0x8000) / 0x10000 + c |
+        M * P =  | (d * x_dst + e * y_dst + 0x8000) / 0x10000 + f |
+                 |                   0x10000                      |
+    
+    These calculations are not perfectly exact and we may get rounding
+    because the integer coordinates are adjusted by 0.5 (or 0x8000 in the
+    16.16 fixed point format) before doing matrix multiplication. For
+    example, if the 'a' coefficient is an odd number and 'b' is zero,
+    then we are losing some of the least significant bits when dividing by
+    0x10000.
+    
+    So we need to strictly prove that the following expression is always
+    true even though we have to deal with rounding:
+    
+                                              | a |
+        M * (P + ONE_X) - M * P = M * ONE_X = | d |
+                                              | 0 |
+    
+    or
+    
+       ((a * (x_dst + 0x10000) + b * y_dst + 0x8000) / 0x10000 + c)
+      -
+       ((a * x_dst             + b * y_dst + 0x8000) / 0x10000 + c)
+      =
+        a
+    
+    It's easy to see that this is equivalent to
+    
+        a + ((a * x_dst + b * y_dst + 0x8000) / 0x10000 + c)
+          - ((a * x_dst + b * y_dst + 0x8000) / 0x10000 + c)
+      =
+        a
+    
+    Which means that stepping exactly by one pixel horizontally in the
+    destination image space (advancing 'x_dst' by 0x10000) is the same as
+    changing the transformed 'x_src' coordinate in the source image space
+    exactly by 'a'. The same applies to the vertical direction too.
+    Repeating these steps, we can reach any pixel in the source image
+    space and get exactly the same fixed point coordinates as doing
+    matrix multiplications per each pixel.
+    
+    By the way, the older matrix multiplication implementation, which was
+    relying on less accurate calculations with three intermediate roundings
+    "((a + 0x8000) >> 16) + ((b + 0x8000) >> 16) + ((c + 0x8000) >> 16)",
+    also has the same properties. However reverting
+        http://cgit.freedesktop.org/pixman/commit/?id=ed39992564beefe6b12f81e842caba11aff98a9c
+    and applying this "Remove the 8e extra safety margin in COVER_CLIP
+    analysis" patch makes the cover test fail. The real reason why it fails
+    is that the old pixman code was using "pixman_transform_point_3d()"
+    function
+        http://cgit.freedesktop.org/pixman/tree/pixman/pixman-matrix.c?id=pixman-0.28.2#n49
+    for getting the transformed coordinate of the top left corner pixel
+    in the image scaling code, but at the same time using a different
+    "pixman_transform_point()" function
+        http://cgit.freedesktop.org/pixman/tree/pixman/pixman-matrix.c?id=pixman-0.28.2#n82
+    in the extents calculation code for setting the cover flag. And these
+    functions did the intermediate rounding differently. That's why the 8e
+    safety margin was needed.
+    
+    ** proof ends
+    
+    However, for COVER_CLIP_NEAREST, the actual margins added were not 8e.
+    Because the half-way cases round down, that is, coordinate 0 hits pixel
+    index -1 while coordinate e hits pixel index 0, the extra safety margins
+    were actually 7e to the left and up, and 9e to the right and down. This
+    patch removes the 7e and 9e margins and restores the -e adjustment
+    required for NEAREST sampling in Pixman. For reference, see
+    pixman/rounding.txt.
+    
+    For COVER_CLIP_BILINEAR, the margins were exactly 8e as there are no
+    additional offsets to be restored, so simply removing the 8e additions
+    is enough.
+    
+    Proof:
+    
+    All implementations must give the same numerical results as
+    bits_image_fetch_pixel_nearest() / bits_image_fetch_pixel_bilinear().
+    
+    The former does
+        int x0 = pixman_fixed_to_int (x - pixman_fixed_e);
+    which maps directly to the new test for the nearest flag, when you consider
+    that x0 must fall in the interval [0,width).
+    
+    The latter does
+        x1 = x - pixman_fixed_1 / 2;
+        x1 = pixman_fixed_to_int (x1);
+        x2 = x1 + 1;
+    When you write a COVER path, you take advantage of the assumption that
+    both x1 and x2 fall in the interval [0, width).
+    
+    As samplers are allowed to fetch the pixel at x2 unconditionally, we
+    require
+        x1 >= 0
+        x2 < width
+    so
+        x - pixman_fixed_1 / 2 >= 0
+        x - pixman_fixed_1 / 2 + pixman_fixed_1 < width * pixman_fixed_1
+    so
+        pixman_fixed_to_int (x - pixman_fixed_1 / 2) >= 0
+        pixman_fixed_to_int (x + pixman_fixed_1 / 2) < width
+    which matches the source code lines for the bilinear case, once you delete
+    the lines that add the 8e margin.
+    
+    Signed-off-by: Ben Avison <bavison@riscosopen.org>
+    [Pekka: adjusted commit message, left affine-bench changes for another patch]
+    [Pekka: add commit message parts from Siarhei]
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 23525b4ea5bc2dd67f8f65b90d023b6580ecbc36
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue Sep 22 12:43:25 2015 +0100
+
+    pixman-general: Tighten up calculation of temporary buffer sizes
+    
+    Each of the aligns can only add a maximum of 15 bytes to the space
+    requirement. This permits some edge cases to use the stack buffer where
+    previously it would have deduced that a heap buffer was required.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 8b49d4b6b460d0c9299bca4ccddd7cd00d8f8441
+Author: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Date:   Tue Sep 22 04:25:40 2015 +0300
+
+    pixman-general: Fix stack related pointer arithmetic overflow
+    
+    As https://bugs.freedesktop.org/show_bug.cgi?id=92027#c6 explains,
+    the stack is allocated at the very top of the process address space
+    in some configurations (32-bit x86 systems with ASLR disabled).
+    And the careless computations done with the 'dest_buffer' pointer
+    may overflow, failing the buffer upper limit check.
+    
+    The problem can be reproduced using the 'stress-test' program,
+    which segfaults when executed via setarch:
+    
+        export CFLAGS="-O2 -m32" && ./autogen.sh
+        ./configure --disable-libpng --disable-gtk && make
+        setarch i686 -R test/stress-test
+    
+    This patch introduces the required corrections. The extra check
+    for negative 'width' may be redundant (the invalid 'width' value
+    is not supposed to reach here), but it's better to play safe
+    when dealing with the buffers allocated on stack.
+    
+    Reported-by: Ludovic Courtès <ludo@gnu.org>
+    Signed-off-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Reviewed-by: soren.sandmann@gmail.com
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 4297e9058d252cac653723fe0b1bee559fbac3a4
+Author: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Date:   Thu Sep 17 15:43:27 2015 +0200
+
+    test: add a check for FE_DIVBYZERO
+    
+    Some architectures, such as Microblaze and Nios2, currently do not
+    implement FE_DIVBYZERO, even though they have <fenv.h> and
+    feenableexcept(). This commit adds a configure.ac check to verify
+    whether FE_DIVBYZERO is defined or not, and if not, disables the
+    problematic code in test/utils.c.
+    
+    Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+    Signed-off-by: Marek Vasut <marex@denx.de>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 8189fad9610981d5b4dcd8f8980ff169110fb33c
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Sep 6 11:45:20 2015 +0300
+
+    vmx: Remove unused expensive functions
+    
+    Now that we replaced the expensive functions with better performing
+    alternatives, we should remove them so they will not be used again.
+    
+    Running Cairo benchmark on trimmed traces gave the following results:
+    
+    POWER8, 8 cores, 3.4GHz, RHEL 7.2 ppc64le.
+    
+    Speedups
+    ========
+    t-firefox-scrolling     1232.30 -> 1096.55 :  1.12x
+    t-gnome-terminal-vim    613.86  -> 553.10  :  1.11x
+    t-evolution             405.54  -> 371.02  :  1.09x
+    t-firefox-talos-gfx     919.31  -> 862.27  :  1.07x
+    t-gvim                  653.02  -> 616.85  :  1.06x
+    t-firefox-canvas-alpha  941.29  -> 890.42  :  1.06x
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 6b1b8b2b90da11bf6101a151786b2a8c9f087338
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jun 28 13:17:41 2015 +0300
+
+    vmx: implement fast path vmx_composite_over_n_8_8888
+    
+    POWER8, 8 cores, 3.4GHz, RHEL 7.2 ppc64le.
+    
+    reference memcpy speed = 25008.9MB/s (6252.2MP/s for 32bpp fills)
+    
+                    Before         After           Change
+                  ---------------------------------------------
+    L1              91.32          182.84         +100.22%
+    L2              94.94          182.83         +92.57%
+    M               95.55          181.51         +89.96%
+    HT              88.96          162.09         +82.21%
+    VT              87.4           168.35         +92.62%
+    R               83.37          146.23         +75.40%
+    RT              66.4           91.5           +37.80%
+    Kops/s          683            859            +25.77%
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 8d8caa55a38c00351047d24322e23b201b6b29ff
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Sep 6 11:46:15 2015 +0300
+
+    vmx: optimize vmx_composite_over_n_8888_8888_ca
+    
+    This patch optimizes vmx_composite_over_n_8888_8888_ca by removing use
+    of expand_alpha_1x128, unpack/pack and in_over_2x128 in favor of
+    splat_alpha, in_over and MUL/ADD macros from pixman_combine32.h.
+    
+    Running "lowlevel-blt-bench -n over_8888_8888" on POWER8, 8 cores,
+    3.4GHz, RHEL 7.2 ppc64le gave the following results:
+    
+    reference memcpy speed = 23475.4MB/s (5868.8MP/s for 32bpp fills)
+    
+                    Before          After           Change
+                  --------------------------------------------
+    L1              244.97          474.05         +93.51%
+    L2              243.74          473.05         +94.08%
+    M               243.29          467.16         +92.02%
+    HT              144.03          252.79         +75.51%
+    VT              174.24          279.03         +60.14%
+    R               109.86          149.98         +36.52%
+    RT              47.96           53.18          +10.88%
+    Kops/s          524             576            +9.92%
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 857880f0e4d1d42a8508ac77be33556cc6f7f546
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Sep 6 10:58:30 2015 +0300
+
+    vmx: optimize scaled_nearest_scanline_vmx_8888_8888_OVER
+    
+    This patch optimizes scaled_nearest_scanline_vmx_8888_8888_OVER and all
+    the functions it calls (combine1, combine4 and
+    core_combine_over_u_pixel_vmx).
+    
+    The optimization is done by removing use of expand_alpha_1x128 and
+    expand_alpha_2x128 in favor of splat_alpha and MUL/ADD macros from
+    pixman_combine32.h.
+    
+    Running "lowlevel-blt-bench -n over_8888_8888" on POWER8, 8 cores,
+    3.4GHz, RHEL 7.2 ppc64le gave the following results:
+    
+    reference memcpy speed = 24847.3MB/s (6211.8MP/s for 32bpp fills)
+    
+                    Before          After           Change
+                  --------------------------------------------
+    L1              182.05          210.22         +15.47%
+    L2              180.6           208.92         +15.68%
+    M               180.52          208.22         +15.34%
+    HT              130.17          178.97         +37.49%
+    VT              145.82          184.22         +26.33%
+    R               104.51          129.38         +23.80%
+    RT              48.3            61.54          +27.41%
+    Kops/s          430             504            +17.21%
+    
+    v2: Check *pm is not NULL before dereferencing it in combine1()
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 73e586efb3ee149f76f15d9e549bffa15d8e30ec
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Mon Sep 7 14:40:49 2015 +0300
+
+    armv6: enable over_n_8888
+    
+    Enable the fast path added in the previous patch by moving the lookup
+    table entries to their proper locations.
+    
+    Lowlevel-blt-bench benchmark statistics with 30 iterations, showing the
+    effect of adding this one patch on top of
+    "armv6: Add over_n_8888 fast path (disabled)", which was applied on
+    fd595692941f3d9ddea8934462bd1d18aed07c65.
+    
+           Before          After
+          Mean StdDev     Mean StdDev   Confidence   Change
+    L1    12.5   0.04     45.2   0.10    100.00%    +263.1%
+    L2    11.1   0.02     43.2   0.03    100.00%    +289.3%
+    M      9.4   0.00     42.4   0.02    100.00%    +351.7%
+    HT     8.5   0.02     25.4   0.10    100.00%    +198.8%
+    VT     8.4   0.02     22.3   0.07    100.00%    +167.0%
+    R      8.2   0.02     23.1   0.09    100.00%    +183.6%
+    RT     5.4   0.05     11.4   0.21    100.00%    +110.3%
+    
+    At most 3 outliers rejected per test per set.
+    
+    Iterating here means that lowlevel-blt-bench was executed 30 times, and
+    the statistics above were computed from the output.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 9eb6889b15a180cc94aad8ac97189af5b3a68b96
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Mon Sep 7 14:40:48 2015 +0300
+
+    armv6: Add over_n_8888 fast path (disabled)
+    
+    This new fast path is initially disabled by putting the entries in the
+    lookup table after the sentinel. The compiler cannot tell the new code
+    is not used, so it cannot eliminate the code. Also the lookup table size
+    will include the new fast path. When the follow-up patch then enables
+    the new fast path, the binary layout (alignments, size, etc.) will stay
+    the same compared to the disabled case.
+    
+    Keeping the binary layout identical is important for benchmarking on
+    Raspberry Pi 1. The addresses at which functions are loaded will have a
+    significant impact on benchmark results, causing unexpected performance
+    changes. Keeping all function addresses the same across the patch
+    enabling a new fast path improves the reliability of benchmarks.
+    
+    Benchmark results are included in the patch enabling this fast path.
+    
+    [Pekka: disabled the fast path, commit message]
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 4c71f595e3393be5b922df37d50d71dd83f4f979
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Sep 2 20:35:59 2015 +0100
+
+    test: Add cover-test v5
+    
+    This test aims to verify both numerical correctness and the honouring of
+    array bounds for scaled plots (both nearest-neighbour and bilinear) at or
+    close to the boundary conditions for applicability of "cover" type fast paths
+    and iter fetch routines.
+    
+    It has a secondary purpose: by setting the env var EXACT (to any value) it
+    will only test plots that are exactly on the boundary condition. This makes
+    it possible to ensure that "cover" routines are being used to the maximum,
+    although this requires the use of a debugger or code instrumentation to
+    verify.
+    
+    Changes in v4:
+    
+      Check the fence page size and skip the test if it is too large. Since
+      we need to deal with pixman_fixed_t coordinates that go beyond the
+      real image width, make the page size limit 16 kB. A 32 kB or larger
+      page size would cause an a8 image width to be 32k or more, which is no
+      longer representable in pixman_fixed_t.
+    
+      Use a shorthand variable 'filter' in test_cover().
+    
+      Whitespace adjustments.
+    
+    Changes in v5:
+    
+      Skip if fenced memory is not supported. Do you know of any such
+      platform?
+    
+    Signed-off-by: Ben Avison <bavison@riscosopen.org>
+    [Pekka: changes in v4 and v5]
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+    Acked-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 812c9c9758e1503bd1725af9c6fe9ede6a467506
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Tue Sep 8 13:35:33 2015 +0300
+
+    implementation: add PIXMAN_DISABLE=wholeops
+    
+    Add a new option to PIXMAN_DISABLE: "wholeops". This option disables all
+    whole-operation fast paths regardless of implementation level, except
+    the general path (general_composite_rect).
+    
+    The purpose is to add a debug option that allows us to test optimized
+    iterator paths specifically. With this, it is possible to see if:
+    - fast paths mask bugs in iterators
+    - compare fast paths with iterator paths for performance
+    
+    The effect was tested on x86_64 by running:
+    $ PIXMAN_DISABLE='' ./test/lowlevel-blt-bench over_8888_8888
+    $ PIXMAN_DISABLE='wholeops' ./test/lowlevel-blt-bench over_8888_8888
+    
+    In the first case time is spent in sse2_composite_over_8888_8888(), and
+    in the latter in sse2_combine_over_u().
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit e9ef2cc4dea04792a03d604c075c344055765217
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Tue Sep 8 09:36:48 2015 +0300
+
+    utils.[ch]: add fence_get_page_size()
+    
+    Add a function to get the page size used for memory fence purposes, and
+    use it everywhere where getpagesize() was used.
+    
+    This offers a single point in code to override the page size, in case
+    one wants to experiment how the tests work with a higher page size than
+    what the developer's machine has.
+    
+    This also offers a clean API, without adding #ifdefs, to tests for
+    checking the page size.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 82f8c997dfd3f60a48134107ecf38663b464bdc9
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Tue Sep 8 09:20:46 2015 +0300
+
+    utils.c: fix fallback code for fence_image_create_bits()
+    
+    Used a wrong variable name, causing:
+    /home/pq/git/pixman/demos/../test/utils.c: In function ‘fence_image_create_bits’:
+    /home/pq/git/pixman/demos/../test/utils.c:562:46: error: ‘width’ undeclared (first use in this function)
+    
+    Use the correct variable.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 07006853828a59b5e0cd7d7d058d03db4e23e6ec
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Thu May 7 17:16:05 2015 +0300
+
+    test: add fence-image-self-test
+    
+    Tests that fence_malloc and fence_image_create_bits actually work: that
+    out-of-bounds and out-of-row (unused stride area) accesses trigger
+    SIGSEGV.
+    
+    If fence_malloc is a dummy (FENCE_MALLOC_ACTIVE not defined), this test
+    is skipped.
+    
+    Changes in v2:
+    
+    - check FENCE_MALLOC_ACTIVE value, not whether it is defined
+    - test that reading bytes near the fence pages does not cause a
+      segmentation fault
+    
+    Changes in v3:
+    
+    - Do not print progress messages unless VERBOSE environment variable is
+      set. Avoid spamming the terminal output of 'make check' on some
+      versions of autotools.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 13d93aa12050ce99643d56b0c730404294f46c2f
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Thu May 7 16:46:01 2015 +0300
+
+    utils.[ch]: add fence_image_create_bits ()
+    
+    Useful for detecting out-of-bounds accesses in composite operations.
+    
+    This will be used by follow-up patches adding new tests.
+    
+    Changes in v2:
+    
+    - fix style on fence_image_create_bits args
+    - add page to stride only if stride_fence
+    - add comment on the fallback definition about freeing storage
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit c70ddd5c9e12d87ff461d73a6f53b00d52925cf5
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Thu May 7 14:21:30 2015 +0300
+
+    utils.[ch]: add FENCE_MALLOC_ACTIVE
+    
+    Define a new token to simplify checking whether fence_malloc() actually
+    can catch out-of-bounds access.
+    
+    This will be used in the future to skip tests that rely on fence_malloc
+    checking functionality.
+    
+    Changes in v2:
+    
+    - #define FENCE_MALLOC_ACTIVE always, but change its value to help catch
+      use of it without including utils.h
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit a82e519944e5d1af41cc94a14d9ae1fe0e430e68
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu Aug 20 13:07:48 2015 +0100
+
+    scaling-test: list more details when verbose
+    
+    Add mask details to the output.
+    
+    [Pekka: redo whitespace and print src,dst,mask x and y.]
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit fd595692941f3d9ddea8934462bd1d18aed07c65
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Tue Jul 7 11:31:20 2015 +0300
+
+    lowlevel-blt-bench: make extra arguments an error
+    
+    If a user gives multiple patterns or extra arguments, only the last one
+    was used as the pattern while the former were just ignored. This is a
+    user error silently converted to something possibly unexpected.
+    
+    In presence of extra arguments, complain and quit.
+    
+    Cc: Ben Avison <bavison@riscosopen.org>
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 69611473c5a4e7cc2e6016d82ff4ed28e289484a
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sat Aug 1 23:01:43 2015 +0300
+
+    Post-release version bump to 0.33.3
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit ee790044b08e3b668e6aa5d9229f46ed7295ebf0
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sat Aug 1 22:34:53 2015 +0300
+
+    Pre-release version bump to 0.33.2
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 8d9be3619a906855a3e3a1e052317833cb24cabe
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Wed Jul 1 14:34:07 2015 +0300
+
+    vmx: implement fast path iterator vmx_fetch_a8
+    
+    no changes were observed when running cairo trimmed benchmarks.
+    
+    Running "lowlevel-blt-bench src_8_8888" on POWER8, 8 cores,
+    3.4GHz, RHEL 7.1 ppc64le gave the following results:
+    
+    reference memcpy speed = 25197.2MB/s (6299.3MP/s for 32bpp fills)
+    
+                    Before          After           Change
+                  --------------------------------------------
+    L1              965.34          3936           +307.73%
+    L2              942.99          3436.29        +264.40%
+    M               902.24          2757.77        +205.66%
+    HT              448.46          784.99         +75.04%
+    VT              430.05          819.78         +90.62%
+    R               412.9           717.04         +73.66%
+    RT              168.93          220.63         +30.60%
+    Kops/s          1025            1303           +27.12%
+    
+    It was benchmarked against commid id e2d211a from pixman/master
+    
+    Siarhei Siamashka reported that on playstation3, it shows the following
+    results:
+    
+    == before ==
+    
+                  src_8_8888 =  L1: 194.37  L2: 198.46  M:155.90 (148.35%)
+                  HT: 59.18  VT: 36.71  R: 38.93  RT: 12.79 ( 106Kops/s)
+    
+    == after ==
+    
+                  src_8_8888 =  L1: 373.96  L2: 391.10  M:245.81 (233.88%)
+                  HT: 80.81  VT: 44.33  R: 48.10  RT: 14.79 ( 122Kops/s)
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 47f74ca94637d79ee66c37a81eea0200e453fcc1
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Mon Jun 29 15:31:02 2015 +0300
+
+    vmx: implement fast path iterator vmx_fetch_x8r8g8b8
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 8 cores, 3.4GHz, RHEL 7.1 ppc64le.
+    
+    cairo trimmed benchmarks :
+    
+    Speedups
+    ========
+    t-firefox-asteroids  533.92  -> 489.94 :  1.09x
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit fcbb97d4458d717b9c15858aedcbee2d33c8ac5a
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jun 28 23:25:24 2015 +0300
+
+    vmx: implement fast path scaled nearest vmx_8888_8888_OVER
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 8 cores, 3.4GHz, RHEL 7.1 ppc64le.
+    reference memcpy speed = 24764.8MB/s (6191.2MP/s for 32bpp fills)
+    
+                    Before           After           Change
+                  ---------------------------------------------
+    L1              134.36          181.68          +35.22%
+    L2              135.07          180.67          +33.76%
+    M               134.6           180.51          +34.11%
+    HT              121.77          128.79          +5.76%
+    VT              120.49          145.07          +20.40%
+    R               93.83           102.3           +9.03%
+    RT              50.82           46.93           -7.65%
+    Kops/s          448             422             -5.80%
+    
+    cairo trimmed benchmarks :
+    
+    Speedups
+    ========
+    t-firefox-asteroids  533.92 -> 497.92 :  1.07x
+        t-midori-zoomed  692.98 -> 651.24 :  1.06x
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit ad612c4205f0ae46fc72a50e0c90ccd05487fcba
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jun 28 22:23:44 2015 +0300
+
+    vmx: implement fast path vmx_composite_src_x888_8888
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 8 cores, 3.4GHz, RHEL 7.1 ppc64le.
+    reference memcpy speed = 24764.8MB/s (6191.2MP/s for 32bpp fills)
+    
+                    Before           After           Change
+                  ---------------------------------------------
+    L1              1115.4          5006.49         +348.85%
+    L2              1112.26         4338.01         +290.02%
+    M               1110.54         2524.15         +127.29%
+    HT              745.41          1140.03         +52.94%
+    VT              749.03          1287.13         +71.84%
+    R               423.91          547.6           +29.18%
+    RT              205.79          194.98          -5.25%
+    Kops/s          1414            1361            -3.75%
+    
+    cairo trimmed benchmarks :
+    
+    Speedups
+    ========
+    t-gnome-system-monitor  1402.62  -> 1212.75 :  1.16x
+       t-firefox-asteroids   533.92  ->  474.50 :  1.13x
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit fafc1d403b8405727d3918bcb605cb98044af90a
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jun 28 10:14:20 2015 +0300
+
+    vmx: implement fast path vmx_composite_over_n_8888_8888_ca
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 8 cores, 3.4GHz, RHEL 7.1 ppc64le.
+    
+    reference memcpy speed = 24764.8MB/s (6191.2MP/s for 32bpp fills)
+    
+                    Before           After           Change
+                  ---------------------------------------------
+    L1              61.92            244.91          +295.53%
+    L2              62.74            243.3           +287.79%
+    M               63.03            241.94          +283.85%
+    HT              59.91            144.22          +140.73%
+    VT              59.4             174.39          +193.59%
+    R               53.6             111.37          +107.78%
+    RT              37.99            46.38           +22.08%
+    Kops/s          436              506             +16.06%
+    
+    cairo trimmed benchmarks :
+    
+    Speedups
+    ========
+    t-xfce4-terminal-a1  1540.37 -> 1226.14 :  1.26x
+    t-firefox-talos-gfx  1488.59 -> 1209.19 :  1.23x
+    
+    Slowdowns
+    =========
+            t-evolution  553.88  -> 581.63  :  1.05x
+              t-poppler  364.99  -> 383.79  :  1.05x
+    t-firefox-scrolling  1223.65 -> 1304.34 :  1.07x
+    
+    The slowdowns can be explained in cases where the images are small and
+    un-aligned to 16-byte boundary. In that case, the function will first
+    work on the un-aligned area, even in operations of 1 byte. In case of
+    small images, the overhead of such operations can be more than the
+    savings we get from using the vmx instructions that are done on the
+    aligned part of the image.
+    
+    In the C fast-path implementation, there is no special treatment for the
+    un-aligned part, as it works in 4 byte quantities on the entire image.
+    
+    Because llbb is a synthetic test, I would assume it has much less
+    alignment issues than "real-world" scenario, such as cairo benchmarks,
+    which are basically recorded traces of real application activity.
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit a3e914407e354df70b9200e263608f1fc2e686cf
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 18 15:05:49 2015 +0300
+
+    vmx: implement fast path composite_add_8888_8888
+    
+    Copied impl. from sse2 file and edited to use vmx functions
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 16 cores, 3.4GHz, ppc64le :
+    
+    reference memcpy speed = 27036.4MB/s (6759.1MP/s for 32bpp fills)
+    
+                    Before           After           Change
+                  ---------------------------------------------
+    L1              248.76          3284.48         +1220.34%
+    L2              264.09          2826.47         +970.27%
+    M               261.24          2405.06         +820.63%
+    HT              217.27          857.3           +294.58%
+    VT              213.78          980.09          +358.46%
+    R               176.61          442.95          +150.81%
+    RT              107.54          150.08          +39.56%
+    Kops/s          917             1125            +22.68%
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit d5b5343c7df99082597e0c37aec937dcf5b6602d
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 18 14:56:47 2015 +0300
+
+    vmx: implement fast path composite_add_8_8
+    
+    Copied impl. from sse2 file and edited to use vmx functions
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 16 cores, 3.4GHz, ppc64le :
+    
+    reference memcpy speed = 27036.4MB/s (6759.1MP/s for 32bpp fills)
+    
+                    Before           After           Change
+                  ---------------------------------------------
+    L1              687.63          9140.84         +1229.33%
+    L2              715             7495.78         +948.36%
+    M               717.39          8460.14         +1079.29%
+    HT              569.56          1020.12         +79.11%
+    VT              520.3           1215.56         +133.63%
+    R               514.81          874.35          +69.84%
+    RT              341.28          305.42          -10.51%
+    Kops/s          1621            1579            -2.59%
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 339eeaf095f949694d7f79a45171ac03a3b06f90
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 18 14:12:05 2015 +0300
+
+    vmx: implement fast path composite_over_8888_8888
+    
+    Copied impl. from sse2 file and edited to use vmx functions
+    
+    It was benchmarked against commid id 2be523b from pixman/master
+    
+    POWER8, 16 cores, 3.4GHz, ppc64le :
+    
+    reference memcpy speed = 27036.4MB/s (6759.1MP/s for 32bpp fills)
+    
+                    Before           After           Change
+                  ---------------------------------------------
+    L1              129.47          1054.62         +714.57%
+    L2              138.31          1011.02         +630.98%
+    M               139.99          1008.65         +620.52%
+    HT              122.11          468.45          +283.63%
+    VT              121.06          532.21          +339.62%
+    R               108.48          240.5           +121.70%
+    RT              77.87           116.7           +49.87%
+    Kops/s          758             981             +29.42%
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 0cc8a2e9714efcb7cdd7e2a94c9cba49c3e29e00
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jun 28 09:42:19 2015 +0300
+
+    vmx: implement fast path vmx_fill
+    
+    Based on sse2 impl.
+    
+    It was benchmarked against commid id e2d211a from pixman/master
+    
+    Tested cairo trimmed benchmarks on POWER8, 8 cores, 3.4GHz,
+    RHEL 7.1 ppc64le :
+    
+    speedups
+    ========
+         t-swfdec-giant-steps  1383.09 ->  718.63  :  1.92x speedup
+       t-gnome-system-monitor  1403.53 ->  918.77  :  1.53x speedup
+                  t-evolution  552.34  ->  415.24  :  1.33x speedup
+          t-xfce4-terminal-a1  1573.97 ->  1351.46 :  1.16x speedup
+          t-firefox-paintball  847.87  ->  734.50  :  1.15x speedup
+          t-firefox-asteroids  565.99  ->  492.77  :  1.15x speedup
+    t-firefox-canvas-swscroll  1656.87 ->  1447.48 :  1.14x speedup
+              t-midori-zoomed  724.73  ->  642.16  :  1.13x speedup
+       t-firefox-planet-gnome  975.78  ->  911.92  :  1.07x speedup
+              t-chromium-tabs  292.12  ->  274.74  :  1.06x speedup
+         t-firefox-chalkboard  690.78  ->  653.93  :  1.06x speedup
+          t-firefox-talos-gfx  1375.30 ->  1303.74 :  1.05x speedup
+       t-firefox-canvas-alpha  1016.79 ->  967.24  :  1.05x speedup
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit c12ee95089e7d281a29a24bf56b81f5c16dec6ee
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Sun Jun 28 09:42:08 2015 +0300
+
+    vmx: add helper functions
+    
+    This patch adds the following helper functions for reuse of code,
+    hiding BE/LE differences and maintainability.
+    
+    All of the functions were defined as static force_inline.
+    
+    Names were copied from pixman-sse2.c so conversion of fast-paths between
+    sse2 and vmx would be easier from now on. Therefore, I tried to keep the
+    input/output of the functions to be as close as possible to the sse2
+    definitions.
+    
+    The functions are:
+    
+    - load_128_aligned       : load 128-bit from a 16-byte aligned memory
+                               address into a vector
+    
+    - load_128_unaligned     : load 128-bit from memory into a vector,
+                               without guarantee of alignment for the
+                               source pointer
+    
+    - save_128_aligned       : save 128-bit vector into a 16-byte aligned
+                               memory address
+    
+    - create_mask_16_128     : take a 16-bit value and fill with it
+                               a new vector
+    
+    - create_mask_1x32_128   : take a 32-bit pointer and fill a new
+                               vector with the 32-bit value from that pointer
+    
+    - create_mask_32_128     : take a 32-bit value and fill with it
+                               a new vector
+    
+    - unpack_32_1x128        : unpack 32-bit value into a vector
+    
+    - unpacklo_128_16x8      : unpack the eight low 8-bit values of a vector
+    
+    - unpackhi_128_16x8      : unpack the eight high 8-bit values of a vector
+    
+    - unpacklo_128_8x16      : unpack the four low 16-bit values of a vector
+    
+    - unpackhi_128_8x16      : unpack the four high 16-bit values of a vector
+    
+    - unpack_128_2x128       : unpack the eight low 8-bit values of a vector
+                               into one vector and the eight high 8-bit
+                               values into another vector
+    
+    - unpack_128_2x128_16    : unpack the four low 16-bit values of a vector
+                               into one vector and the four high 16-bit
+                               values into another vector
+    
+    - unpack_565_to_8888     : unpack an RGB_565 vector to 8888 vector
+    
+    - pack_1x128_32          : pack a vector and return the LSB 32-bit of it
+    
+    - pack_2x128_128         : pack two vectors into one and return it
+    
+    - negate_2x128           : xor two vectors with mask_00ff (separately)
+    
+    - is_opaque              : returns whether all the pixels contained in
+                               the vector are opaque
+    
+    - is_zero                : returns whether the vector equals 0
+    
+    - is_transparent         : returns whether all the pixels
+                               contained in the vector are transparent
+    
+    - expand_pixel_8_1x128   : expand an 8-bit pixel into lower 8 bytes of a
+                               vector
+    
+    - expand_alpha_1x128     : expand alpha from vector and return the new
+                               vector
+    
+    - expand_alpha_2x128     : expand alpha from one vector and another alpha
+                               from a second vector
+    
+    - expand_alpha_rev_2x128 : expand a reversed alpha from one vector and
+                               another reversed alpha from a second vector
+    
+    - pix_multiply_2x128     : do pix_multiply for two vectors (separately)
+    
+    - over_2x128             : perform over op. on two vectors
+    
+    - in_over_2x128          : perform in-over op. on two vectors
+    
+    v2: removed expand_pixel_32_1x128 as it was not used by any function and
+    its implementation was erroneous
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 034149537be94862b43fb09699b8c2149bfe948d
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jul 2 11:04:20 2015 +0300
+
+    vmx: add LOAD_VECTOR macro
+    
+    This patch adds a macro for loading a single vector.
+    It also make the other LOAD_VECTORx macros use this macro as a base so
+    code would be re-used.
+    
+    In addition, I fixed minor coding style issues.
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 744134025609a0a5805c2d3b4d34856eb75cb711
+Author: Nemanja Lukic <nemanja.lukic@rt-rk.com>
+Date:   Fri Jun 27 18:05:39 2014 +0200
+
+    MIPS: update author's e-mail address
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit e2d211ac491cd9884aae7ccaf18e5b3042469cf2
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 13:54:01 2015 +0300
+
+    lowlevel-blt-bench: add option to skip memcpy measurement
+    
+    The memcpy speed measurement takes several seconds. When you are running
+    single tests in a harness that iterates dozens or hundreds of times, the
+    repeated measurements are redundant and take a lot of time. It is also
+    an open question whether the measured speed changes over long test runs
+    due to unidentified platform reasons (Raspberry Pi).
+    
+    Add a command line option to set the reference memcpy speed, skipping
+    the measuring.
+    
+    The speed is mainly used to compute how many iterations do run inside
+    the bench_*() functions, so for repeated testing on the same hardware,
+    it makes sense to lock that number to a constant.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 31cb0d4267f4f358b62f75fd42c4b1ae625be7ee
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 13:20:47 2015 +0300
+
+    lowlevel-blt-bench: add CSV output mode
+    
+    Add a command line option for choosing CSV output mode.
+    
+    In CSV mode, only the results in Mpixels/s are printed in an easily
+    machine-parseable format. All user-friendly printing is suppressed.
+    
+    This is intended for cases where you benchmark one particular operation
+    at a time. Running the "all" set of benchmarks will print just fine, but
+    you may have trouble matching rows to operations as you have to look at
+    the tests_tbl[] to see what row is which.
+    
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+    
+    v2: don't add a space after comma in CSV.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 9a7e0bc6d08c0324f09d6440270cd07201929f3f
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 12:41:57 2015 +0300
+
+    lowlevel-blt-bench: refactor to Mpx_per_sec()
+    
+    Refactor the Mpixels/s computations into a function. Easier to read and
+    better documents what is being computed.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 6e9c48c579e3325506234fa2ee7635f08f2c5a33
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 12:53:09 2015 +0300
+
+    lowlevel-blt-bench: all bench funcs to return pix_cnt
+    
+    The bench_* functions, that did not already do it, are modified to
+    return the number of pixels processed during the benchmark. This moves
+    the computation to the site that actually determines the number, and
+    simplifies bench_composite() a bit.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 9e8f2bcaf5fabd3729ee0ecc90009fd6cea9e8e9
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 12:02:17 2015 +0300
+
+    lowlevel-blt-bench: move speed and scaling printing
+    
+    Move the printing of the memory speed and scaling mode into a new
+    function. This will help with implementing a machine-readable output
+    option.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit a33c2e6853fe0a76da42a43ed7ed9095e2dbe6a2
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 11:56:39 2015 +0300
+
+    lowlevel-blt-bench: print single pattern details
+    
+    When given just a single test pattern instead of "all", print the test
+    details. This can be used to verify the pattern parser agrees with the
+    user, just like scaling settings are printed.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 3ac7ae201758fe99627fdb2adf783be4063a9b1f
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 11:34:45 2015 +0300
+
+    lowlevel-blt-bench: make test_entry::testname const
+    
+    We assign string literals to it, so it better be const.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 56d8b365f5944bf78a427ac65c5a0d0311e0da5e
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 11:21:14 2015 +0300
+
+    lowlevel-blt-bench: move explanation printing
+    
+    Move explanation printing to a new function. This will help with
+    implementing a machine-readable output option.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit bddff993ed734f4b9030c1960bcb3ebe1caca807
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Wed Jun 10 11:14:38 2015 +0300
+
+    lowlevel-blt-bench: move usage to a function
+    
+    Move printing of usage into a new function and use argv[0] as the
+    program name. This will help printing usage from multiple places.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 2be523b20402b7c9f548ac33b8c0f0ed00156c64
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 25 15:59:57 2015 +0300
+
+    vmx: fix pix_multiply for ppc64le
+    
+    vec_mergeh/l operates differently for BE and LE, because of the order of
+    the vector elements (l->r in BE and r->l in LE).
+    To fix that, we simply need to swap between the input parameters, in case
+    we are working in LE.
+    
+    v2:
+    
+    - replace _LITTLE_ENDIAN with WORDS_BIGENDIAN for consistency
+    - fixed whitespaces and indentation issues
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Adam Jackson <ajax@redhat.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 8d379ad88e208bed9697065f6911c9ef83d85276
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 25 15:59:56 2015 +0300
+
+    vmx: fix unused var warnings
+    
+    v2: don't put ';' at the end of macro definition. Instead, move it to
+        each line the macro is used.
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Adam Jackson <ajax@redhat.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit ff66a4a3ce95f2adcbf30b354eac60944596d6a2
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 25 15:59:55 2015 +0300
+
+    vmx: encapsulate the temporary variables inside the macros
+    
+    v2: fixed whitespaces and indentation issues
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Adam Jackson <ajax@redhat.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit f6a26d09257dde9cd41144120543c8b754de515f
+Author: Fernando Seiti Furusato <ferseiti@linux.vnet.ibm.com>
+Date:   Thu Jun 25 15:59:54 2015 +0300
+
+    vmx: adjust macros when loading vectors on ppc64le
+    
+    Replaced usage of vec_lvsl to direct unaligned assignment
+    operation (=). That is because, according to Power ABI Specification,
+    the usage of lvsl is deprecated on ppc64le.
+    
+    Changed COMPUTE_SHIFT_{MASK,MASKS,MASKC} macro usage to no-op for powerpc
+    little endian since unaligned access is supported on ppc64le.
+    
+    v2:
+    
+    - replace _LITTLE_ENDIAN with WORDS_BIGENDIAN for consistency
+    - fixed whitespaces and indentation issues
+    
+    Signed-off-by: Fernando Seiti Furusato <ferseiti@linux.vnet.ibm.com>
+    Reviewed-by: Adam Jackson <ajax@redhat.com>
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit b3a61703f41c6b34ba2ec9736030e1df04f53ab4
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Thu Jun 25 15:59:53 2015 +0300
+
+    vmx: fix splat_alpha for ppc64le
+    
+    The permutation vector isn't correct for LE, so correct its values
+    in case we are in LE mode.
+    
+    v2:
+    
+    - replace _LITTLE_ENDIAN with WORDS_BIGENDIAN for consistency
+    - change #ifndef to #ifdef for readability
+    
+    Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Adam Jackson <ajax@redhat.com>
+    Acked-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit eebc1b78200aff075dbcae9c8d00edad1f830d91
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue May 26 23:58:29 2015 +0100
+
+    mmx/sse2: Use SIMPLE_NEAREST_SOLID_MASK_FAST_PATH for NORMAL repeat
+    
+    These two architectures were the only place where
+    SIMPLE_NEAREST_SOLID_MASK_FAST_PATH was used, and in both cases the
+    equivalent SIMPLE_NEAREST_SOLID_MASK_FAST_PATH_NORMAL macro was used
+    immediately afterwards, so including the NORMAL case in the main macro
+    simplifies the fast path table.
+    
+    [Pekka: removed extra comma from the end of
+     SIMPLE_NEAREST_SOLID_MASK_FAST_PATH]
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 7f6692807902b840b81f860fb2196d2fb242d977
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue May 26 23:58:28 2015 +0100
+
+    mmx/sse2: Use SIMPLE_NEAREST_FAST_PATH macro
+    
+    There is some reordering, but the only significant thing to ensure that
+    the same routine is chosen is that a COVER fast path for a given
+    combination of operator and source/destination pixel formats must
+    precede all the variants of repeated fast paths for the same
+    combination. This patch (and the other mmx/sse2 one) still follows that
+    rule.
+    
+    I believe that in every other case, the set of operations that match any
+    pair of fast paths that are reordered in these patches are mutually
+    exclusive. While there will be a very subtle timing difference due to
+    the distance through the table we have to search to find a match
+    (sometimes faster, sometime slower) there is no evidence that the tables
+    have been carefully ordered by frequency of occurrence - just for ease
+    of copy-and-pasting.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit dee5000abbf74d55cefe00243e5a9fff630c16cb
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue May 26 23:58:27 2015 +0100
+
+    mips: Retire PIXMAN_MIPS_SIMPLE_NEAREST_A8_MASK_FAST_PATH
+    
+    This macro does exactly the same thing as the platform-neutral macro
+    SIMPLE_NEAREST_A8_MASK_FAST_PATH.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 4c70d18acc3a2e20f47a71d9174de9d99244d468
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue May 26 23:58:26 2015 +0100
+
+    arm: Simplify PIXMAN_ARM_SIMPLE_NEAREST_A8_MASK_FAST_PATH
+    
+    This macro is a superset of the platform-neutral macro
+    SIMPLE_NEAREST_A8_MASK_FAST_PATH. In other words, in addition to the
+    _COVER, _NONE and _PAD suffixes, its expansion includes the _NORMAL suffix.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit de255e6a5e3a1364d241d1b23173279c92a9bbe5
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed May 27 12:45:25 2015 +0100
+
+    arm: Retire PIXMAN_ARM_SIMPLE_NEAREST_FAST_PATH
+    
+    This macro does exactly the same thing as the platform-neutral macro
+    SIMPLE_NEAREST_FAST_PATH.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 62a772f2ea9ec14b0240c0cc62e174ffa98ee2cc
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Fri May 29 16:20:43 2015 +0100
+
+    test: Fix solid-test for big-endian targets
+    
+    When generating test data, we need to make sure the interpretation of
+    the data is the same regardless of endianess. That is, the pixel value
+    for each channel is the same on both little and big-endians.
+    
+    This fixes a test failure on ppc64 (big-endian).
+    
+    Tested-by: Fernando Seiti Furusato <ferseiti@linux.vnet.ibm.com> (ppc64le, ppc64, powerpc)
+    Tested-by: Ben Avison <bavison@riscosopen.org> (armv6l, armv7l, i686)
+    [Pekka: added commit message]
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Tested-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk> (x86_64)
+
+commit 82f9b4faaf1aa63ec26b0dfd227f1a8e5e139ae2
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu May 7 19:32:46 2015 +0100
+
+    test: Add new fuzz tester targeting solid images
+    
+    This places a heavier emphasis on solid images than the other fuzz testers,
+    and tests both single-pixel repeating bitmap images as well as those created
+    using pixman_image_create_solid_fill(). In the former case, it also
+    exercises the case where the bitmap contents are written to after the
+    image's first use, which is not a use-case that any other test has
+    previously covered.
+    
+    [Pekka: added the default case to the switch in test_solid ().]
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit cf086d4949092861dc3729465a3881d229cc1060
+Author: James Cowgill <james410@cowgill.org.uk>
+Date:   Tue May 5 16:39:38 2015 +0100
+
+    MIPS: Drop #ifdef __ELF__ in definition of LEAF_MIPS32R2
+    
+    Commit 6d2cf40166d8 ("MIPS: Fix exported symbols in public API") attempted to
+    add a .hidden assembly directive, conditional on the code being compiled for an
+    ELF target. Unfortunately the #ifdef added was already inside a macro and
+    wasn't expanded properly by the preprocessor.
+    
+    Fix by removing the check. It's unlikely there are many non-ELF MIPS systems
+    around anyway.
+    
+    Fixes: Bug 83358 (https://bugs.freedesktop.org/83358)
+    Fixes: 6d2cf40166d8 ("MIPS: Fix exported symbols in public API")
+    Signed-off-by: James Cowgill <james410@cowgill.org.uk>
+    Cc: Vicente Olivert Riera <Vincent.Riera@imgtec.com>
+    Cc: Nemanja Lukic <nemanja.lukic@rt-rk.com>
+    Acked-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 6f14bae79ed490b6f3fd9d66b51d843c0522543e
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Wed Apr 29 11:44:17 2015 -0700
+
+    test: Added more demos and tests to .gitignore file
+    
+    Uses a wildcard to handle the majority which end in "-test".
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit e0c0153d8e5d42c08c2b9bd2cf2123bff2c48d75
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Apr 8 14:20:09 2015 +0100
+
+    test: Add a new benchmarker targeting affine operations
+    
+    Affine-bench is written by following the example of lowlevel-blt-bench.
+    
+    Affine-bench differs from lowlevel-blt-bench in the following:
+    - does not test different sized operations fitting to specific caches,
+      destination is always 1920x1080
+    - allows defining the affine transformation parameters
+    - carefully computes operation extents to hit the COVER_CLIP fast paths
+    
+    Original version by Ben Avison. Changes by Pekka in v3:
+    - commit message
+    - style fixes
+    - more comments
+    - refactoring (e.g. bench_info_t)
+    - help output tweak
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 58e21d3e45c5227c2ca9ac00cf044f22a7975180
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Tue Apr 14 11:42:00 2015 +0300
+
+    lowlevel-blt-bench: use a8r8g8b8 for CA solid masks
+    
+    When doing component alpha with a solid mask, use a mask format that has
+    all the color channels instead of just a8. As Ben Avison explains it:
+    
+    "Lowlevel-blt-bench initialises all its images using memset(0xCC) so an
+    a8 solid image would be converted by _pixman_image_get_solid() to
+    0xCC000000 whereas an a8r8g8b8 would be 0xCCCCCCCC. When you're not in
+    component alpha mode, only the alpha byte matters for the mask image,
+    but in the case of component alpha operations, a fast path might decide
+    that it can save itself a lot of multiplications if it spots that 3
+    constant mask components are already 0."
+    
+    No (default) test so far has a solid mask with CA. This is just
+    future-proofing lowlevel-blt-bench to do what one would expect.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit be49f929b656ef83420072e82658e3b3a96a9277
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Fri Apr 10 16:42:49 2015 +0300
+
+    lowlevel-blt-bench: use the test pattern parser
+    
+    Let lowlevel-blt-bench parse the test name string from the command line,
+    allowing to run almost infinitely more tests. One is no longer limited
+    to the tests listed in the big table.
+    
+    While you can use the old short-hand names like src_8888_8888, you can
+    also use all possible operators now, and specify pixel formats exactly
+    rather than just x888, for instance.
+    
+    This even allows to run crazy patterns like
+    conjoint_over_reverse_a8b8g8r8_n_r8g8b8x8.
+    
+    All individual patterns are now interpreted through the parser. The
+    pattern "all" runs the same old default test set as before but through
+    the parser instead of the hard-coded parameters.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 5b279121086274a18912de77865f83d637094739
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Fri Apr 10 14:39:13 2015 +0300
+
+    lowlevel-blt-bench: add test name parser and self-test
+    
+    This patch is inspired by "lowlevel-blt-bench: Parse test name strings in
+    general case" by Ben Avison. From Ben's commit message:
+    
+    "There are many types of composite operation that are useful to benchmark
+    but which are omitted from the table. Continually having to add extra
+    entries to the table is a nuisance and is prone to human error, so this
+    patch adds the ability to break down unknow strings of the format
+      <operation>_<src>[_<mask]_<dst>[_ca]
+    where bitmap formats are specified by number of bits of each component
+    (assumed in ARGB order) or 'n' to indicate a solid source or mask."
+    
+    Add the parser to lowlevel-blt-bench.c, but do not hook it up to the
+    command line just yet. Instead, make it run a self-test.
+    
+    As we now dynamically parse strings similar to the test names in the
+    huge table 'tests_tbl', we should make sure we can parse the old
+    well-known test names and produce exactly the same test parameters. The
+    self-test goes through this old table and verifies the parsing results.
+    
+    Unfortunately the old table is not exactly consistent, it contains some
+    special cases that cannot be produced by the parsing rules. Whether
+    these special cases are intentional or just an oversight is not always
+    clear. Anyway, add a small table to reproduce the special cases
+    verbatim.
+    
+    If we wanted, we could remove the big old table in a follow-up commit,
+    but then we would also lose the parser self-test.
+    
+    The point of this whole excercise to let lowlevel-blt-bench recognize
+    novel test patterns in the future, following exactly the conventions
+    used in the old table.
+    
+    Ben, from what I see, this parser has one major difference to what you
+    wrote. For a solid mask, your parser uses a8r8g8b8 format, while mine
+    uses a8 which comes from the old table.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 1f45bd6565607049c7bcf707f2fdaedbb16bc926
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Fri Apr 10 12:50:23 2015 +0300
+
+    test/utils: add format aliases used by lowlevel-blt-bench
+    
+    Lowlevel-blt-bench uses several pixel format shorthands. Pick them from
+    the great table in lowlevel-blt-bench.c and add them here so that
+    format_from_string() can recognize them.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit ef9c28a0e44f7220f49a5a47cb33077cbbba00ee
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Mon Apr 13 10:06:31 2015 +0300
+
+    test/utils: add operator aliases for lowlevel-blt-bench
+    
+    Lowlevel-blt-bench uses the operator alias "outrev". Add an alias for it
+    in the operator-name table.
+    
+    Also add aliases for overrev, inrev and atoprev, so that
+    lowlevel-blt-bench can later recognize them for new test cases.
+    
+    The aliases are added such, that an operator to name lookup will never
+    return them; it returns the proper names instead.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit f1f6cc23ce340087035e7ec912723e8a6134efc3
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Thu Apr 9 14:17:54 2015 +0300
+
+    test/utils: support format name aliases
+    
+    Previously there was a flat list of formats, used to iterate over all
+    formats when looking up a format from name or listing them. This cannot
+    support name aliases.
+    
+    To support name aliases (multiple name strings mapping to the same
+    format), create a format-name mapping table. Functions format_name(),
+    format_from_string(), and list_formats() should keep on working exactly
+    like before, except format_from_string() now recognizes the additional
+    formats that format_name() already supported.
+    
+    The only the formats from the old format list are added with ENTRY, so
+    that list_formats() works as before. The whole list is verified against
+    the authoritative list in pixman.h, entries missing from the old list
+    are commented out.
+    
+    The extra formats supported by the old format_name() are added as
+    ALIASes. A side-effect of that is that now also format_from_string()
+    recognizes the following new names: x4c4 / c8, x4g4 / g8, c4, g4, g1,
+    yuy2, yv12, null, solid, pixbuf, rpixbuf, unknown.
+    
+    Name aliases will be useful in follow-up patches, where
+    lowlevel-blt-bench.c is converted to parse short-hand format names from
+    strings.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit 2c5fac932061351ae2153026003539745aa9b44e
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Thu Apr 9 13:13:09 2015 +0300
+
+    test/utils: support operator name aliases
+    
+    Previously there was a flat list of operators (pixman_op_t), used to
+    iterate over all operators when looking up an operator from name or
+    listing them. This cannot support name aliases.
+    
+    To support name aliases (multiple name strings mapping to the same
+    operator), create an operator-name mapping table. Functions
+    operator_name, operator_from_string, and list_operators should keep on
+    working exactly like before, except operator_from_string now recognizes
+    a few aliases too.
+    
+    Name aliases will be useful in follow-up patches, where
+    lowlevel-blt-bench.c is converted to parse operator names from strings.
+    Lowlevel-blt-bench uses shorthand names instead of the usual names. This
+    change allows lowlevel-blt-bench.s to use operator_from_string in the
+    future.
+    
+    Signed-off-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+    Reviewed-by: Ben Avison <bavison@riscosopen.org>
+
+commit f122907dc1d18cdd7e11fec5e4f9c220c62e6e77
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue Mar 3 15:24:17 2015 +0000
+
+    test: Move format and operator string functions to utils.[ch]
+    
+    This permits format_from_string(), list_formats(), list_operators() and
+    operator_from_string() to be used from tests other than check-formats.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 9bc025f7cd6e37f5cc1a2c2799aea6850763a33f
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Apr 8 14:20:30 2015 +0100
+
+    pixman.c: Coding style
+    
+    A few violations of coding style were identified in code copied from here
+    into affine-bench.
+    
+    Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+
+commit 978dd9fc6527f476fe980c764f0019a7a0bd451d
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Tue Mar 3 15:24:16 2015 +0000
+
+    armv6: Fix typo in preload macro
+    
+    Missing "lsl" meant that cases with a 32-bit source and/or mask, and an
+    8-bit destination, the code would not assemble.
+
+commit 594e6a6c93e92fcfb495e987aec5617f6c37f467
+Author: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Date:   Mon Sep 22 06:30:51 2014 +0300
+
+    mmx: Fix _mm_empty problems for over_8888_8888/over_8888_n_8888
+    
+    Using "--disable-sse2 --disable-ssse3" configure options and
+    CFLAGS="-m32 -O2 -g" on an x86 system results in pixman "make check"
+    failures:
+    
+        ../test-driver: line 95: 29874 Aborted
+        FAIL: affine-test
+        ../test-driver: line 95: 29887 Aborted
+        FAIL: scaling-test
+    
+    One _mm_empty () was missing and another one is needed to workaround
+    an old GCC bug https://gcc.gnu.org/PR47759 (GCC may move MMX instructions
+    around and cause test suite failures).
+    
+    Reviewed-by: Matt Turner <mattst88@gmail.com>
+
+commit a8669137b9b95b5a6f78c880a51c016a1dd439b4
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Fri Sep 19 21:51:56 2014 -0700
+
+    Fix comment about BILINEAR_INTERPOLATION_BITS to say < 8 rather than <= 8
+    
+    Since a4c79d695d52c94647b1aff7 the constant
+    BILINEAR_INTERPOLATION_BITS must be strictly less than 8, so fix the
+    comment to say this, and also add a COMPILE_TIME_ASSERT in the
+    bilinear fetcher in pixman-fast-path.c
+
+commit f078727f392bc9f235df916e75634ed87177b9b4
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Wed Jan 2 11:16:12 2013 -0800
+
+    mmx: Add nearest over_8888_8888
+    
+    lowlevel-blt-bench -n, over_8888_8888, 15 iterations on Loongson 2f:
+    
+               Before          After
+              Mean StdDev     Mean StdDev   Change
+        L1    15.8   0.02     24.0   0.06   +52.0%
+        L2    14.8   0.15     23.3   0.13   +56.9%
+        M     10.3   0.01     13.8   0.03   +33.6%
+        HT    10.0   0.02     14.5   0.05   +44.7%
+        VT     9.7   0.02     13.5   0.04   +39.2%
+        R      9.1   0.01     12.2   0.04   +34.4%
+        RT     7.1   0.06      8.9   0.09   +25.2%
+
+commit f868ff5e342cfe43d75a53529895e0c2496098d4
+Author: Matt Turner <mattst88@gmail.com>
+Date:   Tue Jan 1 21:18:09 2013 -0800
+
+    mmx: Add nearest over_8888_n_8888
+    
+    lowlevel-blt-bench -n, over_8888_n_8888, 15 iterations on Loongson 2f:
+    
+               Before          After
+              Mean StdDev     Mean StdDev   Change
+        L1     9.7   0.01     19.2   0.02   +98.2%
+        L2     9.6   0.11     19.2   0.16   +99.5%
+        M      7.3   0.02     12.5   0.01   +72.0%
+        HT     6.6   0.01     13.4   0.02  +103.2%
+        VT     6.4   0.01     12.6   0.03   +96.1%
+        R      6.3   0.01     11.2   0.01   +76.5%
+        RT     4.4   0.01      8.1   0.03   +82.6%
+
+commit 6d2cf40166d81bfc63108504c8022dc4fec37ff5
+Author: Nemanja Lukic <nemanja.lukic@rt-rk.com>
+Date:   Fri Jun 27 18:05:38 2014 +0200
+
+    MIPS: Fix exported symbols in public API.
+
+commit 5a2edb3f2c2cfde6b25ac614e2004a9f78583d74
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Sun Jun 1 18:50:23 2014 -0400
+
+    test: Rearrange tests in order of increasing runtime
+    
+    Making short tests run first is convenient to catch obvious bugs
+    early.
+
+commit 9cd283b2eb8279824406bfd47b020d21fc00cf82
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Wed Apr 23 20:25:40 2014 -0400
+
+    pixman-gradient-walker: Make left_x and right_x 64 bit variables
+    
+    The variables left_x, and right_x in gradient_walker_reset() are
+    computed from pos, which is a 64 bit quantity, so to avoid overflows,
+    these variables must be 64 bit as well.
+    
+    Similarly, the left_x and right_x that are stored in
+    pixman_gradient_walker_t need to be 64 bit as well; otherwise,
+    pixman_gradient_walker_pixel() will call reset too often.
+    
+    This fixes the radial-invalid test, which was generating 'invalid'
+    floating point exceptions when the overflows caused color values to be
+    outside of [0, 255].
+
+commit f5f5dbbbc668a3a90c6cfc79bbd2422805db31e7
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Wed Apr 23 20:07:37 2014 -0400
+
+    test: Add radial-invalid test program
+    
+    This program demonstrates a bug in gradient walker, where some integer
+    overflows cause colors outside the range [0, 255] to be generated,
+    which in turns cause 'invalid' floating point exceptions when those
+    colors are converted to uint8_t.
+    
+    The bug was first reported by Owen Taylor on the #cairo IRC channel.
+
+commit 91f32ce961bc85f98b3372b95681ad8918d24b18
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu Apr 24 13:39:06 2014 +0300
+
+    ARMv6: Add fast path for src_x888_0565
+    
+    Benchmark results, "before" is upstream/master
+    5f661ee719be25c3aa0eb0d45e0db23a37e76468, and "after" contains this
+    patch on top.
+    
+    lowlevel-blt-bench, src_8888_0565, 100 iterations:
+    
+           Before          After
+          Mean StdDev     Mean StdDev   Confidence   Change
+    L1    25.9   0.20    115.6   0.70    100.00%    +347.1%
+    L2    14.4   0.23     52.7   3.48    100.00%    +265.0%
+    M     14.1   0.01     79.8   0.17    100.00%    +465.9%
+    HT    10.2   0.03     32.9   0.31    100.00%    +221.2%
+    VT     9.8   0.03     29.8   0.25    100.00%    +203.4%
+    R      9.4   0.03     27.8   0.18    100.00%    +194.7%
+    RT     4.6   0.04     10.9   0.29    100.00%    +135.9%
+    
+    At most 19 outliers rejected per test per set.
+    
+    cairo-perf-trace with trimmed traces results were indifferent.
+    
+    A system-wide perf_3.10 profile on Raspbian shows significant
+    differences in the X server CPU usage. The following were measured from
+    a 130x62 char lxterminal running 'dmesg' every 0.5 seconds for roughly
+    30 seconds. These profiles are libpixman.so symbols only.
+    
+    Before:
+    
+    Samples: 63K of event 'cpu-clock', Event count (approx.): 2941348112, DSO: libpixman-1.so.0.33.1
+     37.77%  Xorg  [.] fast_fetch_r5g6b5
+     14.39%  Xorg  [.] pixman_composite_over_n_8_8888_asm_armv6
+      8.51%  Xorg  [.] fast_write_back_r5g6b5
+      7.38%  Xorg  [.] pixman_composite_src_8888_8888_asm_armv6
+      4.39%  Xorg  [.] pixman_composite_add_8_8_asm_armv6
+      3.69%  Xorg  [.] pixman_composite_src_n_8888_asm_armv6
+      2.53%  Xorg  [.] _pixman_image_validate
+      2.35%  Xorg  [.] pixman_image_composite32
+    
+    After:
+    
+    Samples: 31K of event 'cpu-clock', Event count (approx.): 3619782704, DSO: libpixman-1.so.0.33.1
+     22.36%  Xorg  [.] pixman_composite_over_n_8_8888_asm_armv6
+     13.59%  Xorg  [.] pixman_composite_src_x888_0565_asm_armv6
+     12.75%  Xorg  [.] pixman_composite_src_8888_8888_asm_armv6
+      6.79%  Xorg  [.] pixman_composite_add_8_8_asm_armv6
+      5.95%  Xorg  [.] pixman_composite_src_n_8888_asm_armv6
+      4.12%  Xorg  [.] pixman_image_composite32
+      3.69%  Xorg  [.] _pixman_image_validate
+      3.65%  Xorg  [.] _pixman_bits_image_setup_accessors
+    
+    Before, fast_fetch_r5g6b5 + fast_write_back_r5g6b5 took 46% of the
+    samples in libpixman, and probably incurred some memcpy() load, too.
+    After, pixman_composite_src_x888_0565_asm_armv6 takes 14%. Note, that
+    the sample counts are very different before/after, as less time is spent
+    in Pixman and running time is not exactly the same.
+    
+    Furthermore, in the above test, the CPU idle function was sampled 9%
+    before, and 15% after.
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Re-benchmarked on Raspberry Pi, commit message.
+
+commit 5f661ee719be25c3aa0eb0d45e0db23a37e76468
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Thu Apr 10 09:41:38 2014 +0300
+
+    ARM: use pixman_asm_function in internal headers
+    
+    The two ARM headers contained open-coded copies of pixman_asm_function,
+    replace these.
+    
+    Since it seems customary that ARM headers do not use CPP include guards,
+    rely on the .S files to #include "pixman-arm-asm.h" first. They all
+    do now.
+    
+    v2: Fix a build failure on rpi by adding one #include.
+
+commit ab587b444cf9ac1ee421b9942befc509b52cb109
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Apr 9 16:25:32 2014 +0300
+
+    ARMv6: Add fast path for in_reverse_8888_8888
+    
+    Benchmark results, "before" is the patch
+    * upstream/master 4b76bbfda670f9ede67d0449f3640605e1fc4df0
+    + ARMv6: Support for very variable-hungry composite operations
+    + ARMv6: Add fast path for over_n_8888_8888_ca
+    and "after" contains the additional patches on top:
+    + ARMv6: Add fast path flag to force no preload of destination buffer
+    + ARMv6: Add fast path for in_reverse_8888_8888 (this patch)
+    
+    lowlevel-blt-bench, in_reverse_8888_8888, 100 iterations:
+    
+           Before          After
+          Mean StdDev     Mean StdDev   Confidence   Change
+    L1    21.1   0.07     32.3   0.08    100.00%     +52.9%
+    L2    11.6   0.29     18.0   0.52    100.00%     +54.4%
+    M     10.5   0.01     16.1   0.03    100.00%     +54.1%
+    HT     8.2   0.02     12.0   0.04    100.00%     +45.9%
+    VT     8.1   0.02     11.7   0.04    100.00%     +44.5%
+    R      8.1   0.02     11.3   0.04    100.00%     +39.7%
+    RT     4.8   0.04      6.1   0.09    100.00%     +27.3%
+    
+    At most 12 outliers rejected per test per set.
+    
+    cairo-perf-trace with trimmed traces, 30 iterations:
+    
+                                        Before          After
+                                       Mean StdDev     Mean StdDev   Confidence   Change
+    t-firefox-paintball.trace          18.0   0.01     14.1   0.01    100.00%     +27.4%
+    t-firefox-chalkboard.trace         36.7   0.03     36.0   0.02    100.00%      +1.9%
+    t-firefox-canvas-alpha.trace       20.7   0.22     20.3   0.22    100.00%      +1.9%
+    t-swfdec-youtube.trace              7.8   0.03      7.8   0.03    100.00%      +0.9%
+    t-firefox-talos-gfx.trace          25.8   0.44     25.6   0.29     93.87%      +0.7%  (insignificant)
+    t-firefox-talos-svg.trace          20.6   0.04     20.6   0.03    100.00%      +0.2%
+    t-firefox-fishbowl.trace           21.2   0.04     21.1   0.02    100.00%      +0.2%
+    t-xfce4-terminal-a1.trace           4.8   0.01      4.8   0.01     98.85%      +0.2%  (insignificant)
+    t-swfdec-giant-steps.trace         14.9   0.03     14.9   0.02     99.99%      +0.2%
+    t-poppler-reseau.trace             22.4   0.11     22.4   0.08     86.52%      +0.2%  (insignificant)
+    t-gnome-system-monitor.trace       17.3   0.03     17.2   0.03     99.74%      +0.2%
+    t-firefox-scrolling.trace          24.8   0.12     24.8   0.11     70.15%      +0.1%  (insignificant)
+    t-firefox-particles.trace          27.5   0.18     27.5   0.21     48.33%      +0.1%  (insignificant)
+    t-grads-heat-map.trace              4.4   0.04      4.4   0.04     16.61%      +0.0%  (insignificant)
+    t-firefox-fishtank.trace           13.2   0.01     13.2   0.01      7.64%      +0.0%  (insignificant)
+    t-firefox-canvas.trace             18.0   0.05     18.0   0.05      1.31%      -0.0%  (insignificant)
+    t-midori-zoomed.trace               8.0   0.01      8.0   0.01     78.22%      -0.0%  (insignificant)
+    t-firefox-planet-gnome.trace       10.9   0.02     10.9   0.02     64.81%      -0.0%  (insignificant)
+    t-gvim.trace                       33.2   0.21     33.2   0.18     38.61%      -0.1%  (insignificant)
+    t-firefox-canvas-swscroll.trace    32.2   0.09     32.2   0.11     73.17%      -0.1%  (insignificant)
+    t-firefox-asteroids.trace          11.1   0.01     11.1   0.01    100.00%      -0.2%
+    t-evolution.trace                  13.0   0.05     13.0   0.05     91.99%      -0.2%  (insignificant)
+    t-gnome-terminal-vim.trace         19.9   0.14     20.0   0.14     97.38%      -0.4%  (insignificant)
+    t-poppler.trace                     9.8   0.06      9.8   0.04     99.91%      -0.5%
+    t-chromium-tabs.trace               4.9   0.02      4.9   0.02    100.00%      -0.6%
+    
+    At most 6 outliers rejected per test per set.
+    
+    Cairo perf reports the running time, but the change is computed for
+    operations per second instead (inverse of running time).
+    
+    Confidence is based on Welch's t-test. Absolute changes less than 1%
+    can be accounted as measurement errors, even if statistically
+    significant.
+    
+    There was a question of why FLAG_NO_PRELOAD_DST is used. It makes
+    lowlevel-blt-bench results worse except for L1, but improves some
+    Cairo trace benchmarks.
+    
+    "Ben Avison" <bavison@riscosopen.org> wrote:
+    
+    > The thing with the lowlevel-blt-bench benchmarks for the more
+    > sophisticated composite types (as a general rule, anything that involves
+    > branches at the per-pixel level) is that they are only profiling the case
+    > where you have mid-level alpha values in the source/mask/destination.
+    > Real-world images typically have a disproportionate number of fully
+    > opaque and fully transparent pixels, which is why when there's a
+    > discrepancy between which implementation performs best with cairo-perf
+    > trace versus lowlevel-blt-bench, I usually favour the Cairo winner.
+    >
+    > The results of removing FLAG_NO_PRELOAD_DST (in other words, adding
+    > preload of the destination buffer) are easy to explain in the
+    > lowlevel-blt-bench results. In the L1 case, the destination buffer is
+    > already in the L1 cache, so adding the preloads is simply adding extra
+    > instruction cycles that have no effect on memory operations. The "in"
+    > compositing operator depends upon the alpha of both source and
+    > destination, so if you use uniform mid-alpha, then you actually do need
+    > to read your destination pixels, so you benefit from preloading them. But
+    > for fully opaque or fully transparent source pixels, you don't need to
+    > read the corresponding destination pixel - it'll either be left alone or
+    > overwritten. Since the ARM11 doesn't use write-allocate cacheing, both of
+    > these cases avoid both the time taken to load the extra cachelines, as
+    > well as increasing the efficiency of the cache for other data. If you
+    > examine the source images being used by the Cairo test, you'll probably
+    > find they mostly use transparent or opaque pixels.
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Rebased, re-benchmarked on Raspberry Pi, commit message.
+    
+    v5, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Rebased, re-benchmarked on Raspberry Pi due to a fix to
+    	"ARMv6: Add fast path for over_n_8888_8888_ca" patch.
+
+commit 68d2f7b486a9ccc877a2214f7f5ef562e2846581
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Apr 9 16:25:31 2014 +0300
+
+    ARMv6: Add fast path flag to force no preload of destination buffer
+
+commit 4ad769cbec47ca0df43dc586f689b1968bbc942f
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Apr 9 16:25:30 2014 +0300
+
+    ARMv6: Add fast path for over_n_8888_8888_ca
+    
+    Benchmark results, "before" is
+    * upstream/master 4b76bbfda670f9ede67d0449f3640605e1fc4df0
+    "after" contains the additional patches on top:
+    + ARMv6: Support for very variable-hungry composite operations
+    + ARMv6: Add fast path for over_n_8888_8888_ca (this patch)
+    
+    lowlevel-blt-bench, over_n_8888_8888_ca, 100 iterations:
+    
+           Before          After
+          Mean StdDev     Mean StdDev   Confidence   Change
+    L1     2.7   0.00     16.1   0.06    100.00%    +500.7%
+    L2     2.4   0.01     14.1   0.15    100.00%    +489.9%
+    M      2.3   0.00     14.3   0.01    100.00%    +510.2%
+    HT     2.2   0.00      9.7   0.03    100.00%    +345.0%
+    VT     2.2   0.00      9.4   0.02    100.00%    +333.4%
+    R      2.2   0.01      9.5   0.03    100.00%    +331.6%
+    RT     1.9   0.01      5.5   0.07    100.00%    +192.7%
+    
+    At most 1 outliers rejected per test per set.
+    
+    cairo-perf-trace with trimmed traces, 30 iterations:
+    
+                                        Before          After
+                                       Mean StdDev     Mean StdDev   Confidence   Change
+    t-firefox-talos-gfx.trace          33.1   0.42     25.8   0.44    100.00%     +28.6%
+    t-firefox-scrolling.trace          31.4   0.11     24.8   0.12    100.00%     +26.3%
+    t-gnome-terminal-vim.trace         22.4   0.10     19.9   0.14    100.00%     +12.5%
+    t-evolution.trace                  13.9   0.07     13.0   0.05    100.00%      +6.5%
+    t-firefox-planet-gnome.trace       11.6   0.02     10.9   0.02    100.00%      +6.5%
+    t-gvim.trace                       34.0   0.21     33.2   0.21    100.00%      +2.4%
+    t-chromium-tabs.trace               4.9   0.02      4.9   0.02    100.00%      +1.0%
+    t-poppler.trace                     9.8   0.05      9.8   0.06    100.00%      +0.7%
+    t-firefox-canvas-swscroll.trace    32.3   0.10     32.2   0.09    100.00%      +0.4%
+    t-firefox-paintball.trace          18.1   0.01     18.0   0.01    100.00%      +0.3%
+    t-poppler-reseau.trace             22.5   0.09     22.4   0.11     99.29%      +0.3%
+    t-firefox-canvas.trace             18.1   0.06     18.0   0.05     99.29%      +0.2%
+    t-xfce4-terminal-a1.trace           4.8   0.01      4.8   0.01     99.77%      +0.2%
+    t-firefox-fishbowl.trace           21.2   0.03     21.2   0.04    100.00%      +0.2%
+    t-gnome-system-monitor.trace       17.3   0.03     17.3   0.03     99.54%      +0.1%
+    t-firefox-asteroids.trace          11.1   0.01     11.1   0.01    100.00%      +0.1%
+    t-midori-zoomed.trace               8.0   0.01      8.0   0.01     99.98%      +0.1%
+    t-grads-heat-map.trace              4.4   0.04      4.4   0.04     34.08%      +0.1%  (insignificant)
+    t-firefox-talos-svg.trace          20.6   0.03     20.6   0.04     54.06%      +0.0%  (insignificant)
+    t-firefox-fishtank.trace           13.2   0.01     13.2   0.01     52.81%      -0.0%  (insignificant)
+    t-swfdec-giant-steps.trace         14.9   0.02     14.9   0.03     85.50%      -0.1%  (insignificant)
+    t-firefox-chalkboard.trace         36.6   0.02     36.7   0.03    100.00%      -0.2%
+    t-firefox-canvas-alpha.trace       20.7   0.32     20.7   0.22     55.76%      -0.3%  (insignificant)
+    t-swfdec-youtube.trace              7.8   0.02      7.8   0.03    100.00%      -0.5%
+    t-firefox-particles.trace          27.4   0.16     27.5   0.18     99.94%      -0.6%
+    
+    At most 4 outliers rejected per test per set.
+    
+    Cairo perf reports the running time, but the change is computed for
+    operations per second instead (inverse of running time).
+    
+    Confidence is based on Welch's t-test. Absolute changes less than 1%
+    can be accounted as measurement errors, even if statistically
+    significant.
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Use pixman_asm_function instead of startfunc.
+    	Rebased. Re-benchmarked on Raspberry Pi.
+    	Commit message.
+    
+    v5, Ben Avison <bavison@riscosopen.org> :
+    	Fixed the bug exposed in blitters-test 4928372.
+    	15 hours of testing, compared to the 45 minutes to hit
+    	the bug originally.
+        Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Squash the fix, re-benchmark on Raspberry Pi.
+
+commit 73d2f8b61ae5e320a7795c29b6041b7885cf2953
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Wed Apr 9 16:25:29 2014 +0300
+
+    ARMv6: Support for very variable-hungry composite operations
+    
+    Previously, the variable ARGS_STACK_OFFSET was available to extract values
+    from function arguments during the init macro. Now this changes dynamically
+    around stack operations in the function as a whole so that arguments can be
+    accessed at any point. It is also joined by LOCALS_STACK_OFFSET, which
+    allows access to space reserved on the stack during the init macro.
+    
+    On top of this, composite macros now have the option of using all of WK0-WK3
+    registers rather than just the subset it was told to use; this requires the
+    pixel count to be spilled to the stack over the leading pixels at the start
+    of each line. Thus, at best, each composite operation can use 11 registers,
+    plus any pointer registers not required for the composite type, plus as much
+    stack space as it needs, divided up into constants and variables as necessary.
+
+commit 857e40f3d2bc2cfb714913e0cd7e6184cf69aca3
 Author: Søren Sandmann <ssp@redhat.com>
 Date:   Wed Apr 9 14:14:12 2014 -0400
 
@@ -48,25 +2193,500 @@ Date:   Wed Apr 9 14:14:12 2014 -0400
     
         https://bugs.freedesktop.org/show_bug.cgi?id=69014
 
-commit c42824ebb5a8f0db6d2707f267e40e82d09815d5
-Author: Nemanja Lukic <nemanja.lukic@rt-rk.com>
-Date:   Fri Jun 27 18:05:38 2014 +0200
+commit 4b76bbfda670f9ede67d0449f3640605e1fc4df0
+Author: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+Date:   Mon Mar 31 15:03:43 2014 +0300
 
-    MIPS: Fix exported symbols in public API.
+    ARM: share pixman_asm_function definition
+    
+    Several files define identically the asm macro pixman_asm_function.
+    Merge all these definitions into a new asm header.
+    
+    The original definition is taken from pixman-arm-simd-asm-scaled.S with
+    the copyright/licence/author blurb verbatim.
 
-commit dae5a758e25157b7cb5c79b88ffc819343901dd7
-Author: Matt Turner <mattst88@gmail.com>
-Date:   Sun Nov 17 17:48:54 2013 -0800
+commit 4ee85b008333a95d4dfc27e7b04c444dcbb3a7e7
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Fri Mar 28 11:13:21 2014 +0200
 
-    Post-release version bump to 0.32.5
+    ARMv6: Add fast path for over_reverse_n_8888
+    
+    Benchmark results, "before" is upstream commit
+    c343846 lowlevel-blt-bench: add in_reverse_8888_8888 test
+    and "after" is with this patch only added on top.
+    
+    lowlevel-blt-bench, over_reverse_n_8888, 100 iterations:
+    
+           Before          After
+          Mean StdDev     Mean StdDev   Confidence   Change
+    L1    15.1    0.1    274.5    2.3    100.00%   +1718.9%
+    L2    12.8    0.3    181.8    0.7    100.00%   +1315.5%
+    M     10.8    0.0     77.9    0.0    100.00%    +621.2%
+    HT     9.7    0.0     29.4    0.2    100.00%    +204.9%
+    VT     9.5    0.0     26.7    0.1    100.00%    +179.3%
+    R      9.3    0.0     25.3    0.1    100.00%    +173.6%
+    RT     6.0    0.1     11.0    0.2    100.00%     +82.9%
+    
+    At most 16 outliers rejected per case per set.
+    
+    cairo-perf-trace with trimmed traces, 30 iterations:
+    
+                                        Before          After
+                                       Mean StdDev     Mean StdDev   Confidence   Change
+    t-poppler.trace                    12.9    0.1      9.7    0.0    100.00%     +32.6%
+    t-firefox-talos-gfx.trace          33.2    0.7     32.9    0.4     95.23%      +0.9%  (insignificant)
+    t-firefox-particles.trace          27.4    0.1     27.3    0.2     99.65%      +0.4%
+    t-firefox-canvas-alpha.trace       20.5    0.3     20.5    0.3     57.51%      +0.3%  (insignificant)
+    t-poppler-reseau.trace             22.4    0.1     22.4    0.1     95.69%      +0.3%  (insignificant)
+    t-firefox-fishtank.trace           13.2    0.0     13.2    0.0     99.84%      +0.1%
+    t-swfdec-giant-steps.trace         14.9    0.0     14.9    0.0     87.68%      +0.1%  (insignificant)
+    t-swfdec-youtube.trace              7.8    0.0      7.8    0.0     35.22%      +0.1%  (insignificant)
+    t-firefox-planet-gnome.trace       11.5    0.0     11.5    0.0     29.37%      +0.0%  (insignificant)
+    t-firefox-fishbowl.trace           21.2    0.0     21.2    0.0     18.09%      +0.0%  (insignificant)
+    t-grads-heat-map.trace              4.4    0.0      4.4    0.0      1.84%      +0.0%  (insignificant)
+    t-firefox-paintball.trace          18.0    0.0     18.0    0.0     33.43%      -0.0%  (insignificant)
+    t-firefox-talos-svg.trace          20.5    0.0     20.5    0.1     68.56%      -0.1%  (insignificant)
+    t-midori-zoomed.trace               8.0    0.0      8.0    0.0     99.98%      -0.1%
+    t-firefox-canvas-swscroll.trace    32.1    0.1     32.1    0.1     85.27%      -0.1%  (insignificant)
+    t-gnome-system-monitor.trace       17.2    0.0     17.2    0.0     99.97%      -0.2%
+    t-firefox-chalkboard.trace         36.5    0.0     36.6    0.0    100.00%      -0.2%
+    t-firefox-asteroids.trace          11.1    0.0     11.1    0.0    100.00%      -0.2%
+    t-firefox-canvas.trace             17.9    0.0     18.0    0.0    100.00%      -0.3%
+    t-chromium-tabs.trace               4.9    0.0      4.9    0.0     97.95%      -0.3%  (insignificant)
+    t-xfce4-terminal-a1.trace           4.8    0.0      4.8    0.0    100.00%      -0.4%
+    t-firefox-scrolling.trace          31.1    0.1     31.2    0.1    100.00%      -0.5%
+    t-evolution.trace                  13.7    0.1     13.8    0.1     99.99%      -0.6%
+    t-gnome-terminal-vim.trace         22.0    0.2     22.2    0.1     99.99%      -0.7%
+    t-gvim.trace                       33.2    0.2     33.5    0.2    100.00%      -0.8%
+    
+    At most 6 outliers rejected per case per set.
+    
+    Cairo perf reports the running time, but the change is computed for
+    operations per second instead (inverse of running time).
+    
+    Changes in the order of +/- 1% can be accounted for measurement errors,
+    even if they are deemed to be statistically significant. This claim is
+    based on comparing two 30-iteration identical "before" runs using the
+    exact same binaries, and observing changes from -0.4% to +0.5% with
+    >=99% confidence.
+    
+    Confidence is based on Welch's t-test.
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Rebased, re-benchmarked on Raspberry Pi, commit message.
 
-commit 4b3a66b05ed69507b297ed62574fc97eb9472e1e
-Author: Matt Turner <mattst88@gmail.com>
-Date:   Sun Nov 17 17:46:52 2013 -0800
+commit 56622140e3a8175c8ccc82c9717adf8372043364
+Author: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Date:   Fri Mar 7 08:23:10 2014 +0200
 
-    Pre-release version bump to 0.32.4
+    test: Fix OpenMP clauses for the tolerance-test
+    
+    Compiling with the Intel Compiler reveals a problem:
+    
+    tolerance-test.c(350): error: index variable "i" of for statement following an OpenMP for pragma must be private
+      #       pragma omp parallel for default(none) shared(i) private (result)
+      ^
+    
+    In addition to this, the 'result' variable also should not be private
+    (otherwise its value does not survive after the end of the loop). It
+    needs to be either shared or use the reduction clause to describe how
+    the results from multiple threads are combined together. Reduction
+    seems to be more appropriate here.
 
-commit 97a655d5cafc07e9185155c885b2d4564986ef85
+commit 840912b31159aa8ac7be4ea0cee8bdef95a539a4
+Author: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Date:   Fri Mar 7 06:39:42 2014 +0200
+
+    configure.ac: Check if the compiler supports GCC vector extensions
+    
+    The Intel Compiler 14.0.0 claims version GCC 4.7.3 compatibility
+    via __GNUC__/__GNUC__MINOR__ macros, but does not provide the same
+    level of GCC vector extensions support as the original GCC compiler:
+        http://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
+    
+    Which results in the following compilation failure:
+    
+    In file included from ../test/utils.h(7),
+                     from ../test/utils.c(3):
+    ../test/utils-prng.h(138): error: expression must have integral type
+          uint32x4 e = x->a - ((x->b << 27) + (x->b >> (32 - 27)));
+                                ^
+    
+    The problem is fixed by doing a special check in configure for
+    this feature.
+
+commit c343846625152bacbba8d35c0354ed8aadb3c6a0
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu Mar 20 10:30:28 2014 +0200
+
+    lowlevel-blt-bench: add in_reverse_8888_8888 test
+    
+    in_reverse_8888_8888 is one of the more commonly used operations in the
+    cairo-perf-trace suite that hasn't been in lowlevel-blt-bench until now.
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Split from "Add extra test to lowlevel-blt-bench and fix an
+    	existing one", new summary.
+
+commit 898859f3d3d91132ca1258429cbbc36231b2b33d
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu Mar 20 10:30:27 2014 +0200
+
+    lowlevel-blt-bench: over_reverse_n_8888 needs solid source
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Split from "Add extra test to lowlevel-blt-bench and fix an
+    	existing one", new summary.
+
+commit 38317cbfde734a8d8ef65906229f41d8f248702c
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu Mar 20 10:30:26 2014 +0200
+
+    ARMv6: remove 1 instr per row in generate_composite_function
+    
+    This knocks off one instruction per row. The effect is probably too small to
+    be measurable, but might as well be included. The second occurrence of this
+    sequence doesn't actually benefit at all, but is changed for consistency.
+    
+    The saved instruction comes from combining the "and" inside the .if
+    statement with an earlier "tst". The "and" was normally needed, except
+    for in one special case, where bits 4-31 were all shifted off the top of
+    the register later on in preload_leading_step2, so we didn't care about
+    their values.
+    
+    v4, Pekka Paalanen <pekka.paalanen@collabora.co.uk> :
+    	Remove "bits 0-3" from the comments, update patch summary, and
+    	augment message with Ben's suggestion.
+
+commit 763a6d3e6740d1624b557f8e49fd21fd26928e2c
+Author: Ben Avison <bavison@riscosopen.org>
+Date:   Thu Mar 20 10:30:25 2014 +0200
+
+    ARMv6: Fix indentation in the composite macros
+
+commit 82d094654a46bd97d47f1f132a01ae0a74b986f3
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Sun Dec 8 09:08:45 2013 -0500
+
+    Remove all the operators that use division from pixman-combine32.c
+    
+    These are now handled by floating point combiners.
+
+commit ccb1df0c5e80736a0afc3482ec5268d729953d65
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Sun Dec 8 08:51:31 2013 -0500
+
+    Copy the comments from pixman-combine32.c to pixman-combine-float.c
+    
+    An upcoming commit will delete many of the operators from
+    pixman-combine32.c and rely on the ones in pixman-combine-float.c. The
+    comments about how the operators were derived are still useful though,
+    so copy them into pixman-combine-float.c before the deletion.
+
+commit 94244b0c401f797835567a8bd165beef8f0dd820
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Mon Sep 30 19:22:20 2013 -0400
+
+    utils.c: Set DEVIATION to 0.0128
+    
+    Consider a HARD_LIGHT operation with the following pixels:
+    
+    - source:           15      (6 bits)
+    - source alpha:     255     (8 bits)
+    - mask alpha:       223     (8 bits)
+    - dest              255     (8 bits)
+    - dest alpha:       0       (8 bits)
+    
+    Since 2 times the source is less than source alpha, the first branch
+    of the hard light blend mode is taken:
+    
+            (1 - sa) * d + (1 - da) * s + 2 * s * d
+    
+    Since da is 0 and d is 1, this degenerates to:
+    
+            (1 - sa) + 3 * s
+    
+    Taking (src IN mask) into account along with the fact that sa is 1,
+    this becomes:
+    
+            (1 - ma) + 3 * s * ma
+    
+          = (1 - 223/255.0) + 3 * (15/63.0) * (223/255.0)
+    
+          = 0.7501400560224089
+    
+    When computed with the source converted by bit replication to eight
+    bits, and additionally with the (src IN mask) part rounded to eight
+    bits, we get:
+    
+            ma = 223/255.0
+    
+            s * ma = (60 / 255.0) * (223/255.0) which rounds to 52 / 255
+    
+    and the result is
+    
+            (1 - ma) + 3 * s * ma
+    
+          = (1 - 223/255.0) + 3 * 52/255.0
+    
+          = 0.7372549019607844
+    
+    so now we have an error of 0.012885.
+    
+    Without making changes to the way pixman does integer
+    rounding/arithmetic, this error must then be considered
+    acceptable. Due to conservative computations in the test suite we can
+    however get away with 0.0128 as the acceptable deviation.
+    
+    This fixes the remaining failures in pixel-test.
+
+commit 15aa37adeca79a22b393ff451e6d29f484c3b0ef
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Sat Nov 23 19:38:50 2013 -0500
+
+    Use floating point combiners for all operators that involve divisions
+    
+    Consider a DISJOINT_ATOP operation with the following pixels:
+    
+    - source:	0xff (8 bits)
+    - source alpha:	0x01 (8 bits)
+    - mask alpha:	0x7b (8 bits)
+    - dest:		0x00 (8 bits)
+    - dest alpha:	0xff (8 bits)
+    
+    When (src IN mask) is computed in 8 bits, the resulting alpha channel
+    is 0 due to rounding:
+    
+         floor ((0x01 * 0x7b) / 255.0 + 0.5) = floor (0.9823) = 0
+    
+    which means that since Render defines any division by zero as
+    infinity, the Fa and Fb for this operator end up as follows:
+    
+         Fa = max (1 - (1 - 1) / 0, 0) = 0
+    
+         Fb = min (1, (1 - 0) / 1) = 1
+    
+    and so since dest is 0x00, the overall result is 0.
+    
+    However, when computed in full precision, the alpha value no longer
+    rounds to 0, and so Fa ends up being
+    
+         Fa = max (1 - (1 - 1) / 0.0001, 0) = 1
+    
+    and so the result is now
+    
+         s * ma * Fa + d * Fb
+    
+       = (1.0 * (0x7b / 255.0) * 1) + d * 0
+    
+       = 0x7b / 255.0
+    
+       = 0.4823
+    
+    so the error in this case ends up being 0.48235294, which is clearly
+    not something that can be considered acceptable.
+    
+    In order to avoid this problem, we need to do all arithmetic in such a
+    way that a multiplication of two tiny numbers can never end up being
+    zero unless one of the input numbers is itself zero.
+    
+    This patch makes all computations that involve divisions take place in
+    floating point, which is sufficient to fix the test cases
+    
+    This brings the number of failures in pixel-test down to 14.
+
+commit 8f3824316300e257a3698daa13db802e32489236
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Mon Nov 18 13:26:33 2013 -0500
+
+    Soft Light: Consistent approach to division by zero
+    
+    The Soft Light operator has several branches. One them is decided
+    based on whether 2 * s is less than or equal to 2 * sa. In floating
+    point implementations, when those two values are very close to each
+    other, it may not be completely predictable which branch we hit.
+    
+    This is a problem because in one branch, when destination alpha is
+    zero, we get the result
+    
+          r = d * as
+    
+    and in the other we get
+    
+          r = 0
+    
+    So when d and as are not 0, this causes two different results to be
+    returned from essentially identical input values. In other words,
+    there is a discontinuity in the current implementation.
+    
+    This patch randomly changes the second branch such that it now returns
+    d * sa instead. There is no deep meaning behind this, because
+    essentially this is an attempt to assign meaning to division by zero,
+    and all that is requires is that that meaning doesn't depend on minute
+    differences in input values.
+    
+    This makes the number of failed pixels in pixel-test go down to 347.
+
+commit 89662adf77c69c3f71ded9cd8818ac5626b68451
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Fri Oct 18 16:39:38 2013 -0400
+
+    pixman-combine32.c: Fix bugs related to integer promotion
+    
+    In the component alpha part of the PDF_SEPARABLE_BLEND_MODE macro, the
+    expression ~RED_8 (m) is used. Because RED_8(m) gets promoted to int
+    before ~ is applied, the whole expression typically becomes some
+    negative value rather than (255 - RED_8(m)) as desired.
+    
+    Fix this by using unsigned temporary variables.
+    
+    This reduces the number of failures in pixel-test to 363.
+
+commit e7a99b3b0f605d3f9937bc79e4385c6b71df7845
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Fri Jan 18 22:25:36 2013 -0500
+
+    pixman/pixman-combine32.c: Bug fixes for separable blend modes
+    
+    This commit fixes four separate bugs:
+    
+    1. In the computation
+    
+          (1 - sa) * d + (1 - da) * s + sa * da * B(s, d)
+    
+       we were using regular addition for all four channels, but for
+       superluminescent pixels, the addition could overflow causing
+       nonsensical results.
+    
+    2. The variables and return types used for the results of the blend
+       mode calculations were unsigned, but for various blend modes (and
+       especially with superluminescent pixels), the blend mode
+       calculations could be negative, resulting in underflows.
+    
+    3. The blend mode computations were returned as 8-bit values, which is
+       not sufficient precision (especially considering that we need
+       signed results).
+    
+    4. The value before the final division by 255 was not properly clamped
+       to [0, 255].
+    
+    This patch fixes all those bugs. The blend mode computations are now
+    returned as signed 16 bit values with 1 represented as 255 * 255.
+    
+    With these fixes, the number of failing pixels in pixel-test goes down
+    from 431 to 384.
+
+commit fe3504d03fafbd8462a34fbe6150254eeb1d0bcd
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Wed Dec 4 10:06:06 2013 -0500
+
+    pixel-test.c: Add a number of pixels that have failed at some point
+    
+    This commit adds a large number of pixel regressions to
+    pixel-test. All of these have at some point been failing in
+    blend-mode-test, and most of them do fail currently.
+    
+    To be specific, with this commit, pixel-test reports 431 failed tests.
+
+commit bd94c1793794b5af9a191380b855f8ff24d7913b
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Thu Jan 17 06:36:51 2013 -0500
+
+    test/tolerance-test: New test program
+    
+    This new test program is similar to test/composite in that it relies
+    on the pixel_checker_t API to do tolerance based verification. But
+    unlike the composite test, which verifies combinations of a fixed set
+    of pixels, this one generates random images and verifies that those
+    composite correctly.
+    
+    Also unlike composite, tolerance-test supports all the separable blend
+    mode operators in addition to the original Render operators.
+    
+    When tests fail, a C struct is printed that can be pasted into
+    pixel-test for regression purposes.
+    
+    There is an option "--forever" which causes the random seed to be set
+    to the current time, and then the test runs until interrupted. This is
+    useful for overnight runs.
+    
+    This test currently fails badly due to various bugs in the blend mode
+    operators. Later commits will fix those.
+
+commit c2fd65dba35027a52696f497d414194514519d0f
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Wed Dec 4 10:32:29 2013 -0500
+
+    pixel-test: Command line argument to specify the regression to run
+    
+    A new command line argument allows the user to specify which one of
+    the regressions should be run.
+
+commit a692e0160081ff509b40a18f6e73240bd6ef9f11
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Wed Dec 4 10:05:44 2013 -0500
+
+    pixel-test: Add support for mask pixels
+    
+    Support is added to pixel-test for verifying operations involving
+    masks. If a regression includes a mask, it is verified with the
+    pixel_checker API in in both unified and component alpha modes.
+
+commit 779ca46e985cd2523fae630227e397e88bd892d0
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Mon Sep 30 19:22:11 2013 -0400
+
+    test/check-formats.c: Add support for separable blend modes
+
+commit a42af27fc02f792b92fd2573e38eac82a71c76d2
+Author: Søren Sandmann Pedersen <ssp@redhat.com>
+Date:   Sat Jan 19 12:24:07 2013 -0500
+
+    test/utils.c: Add support for separable blend mode ops to do_composite()
+    
+    The implementations are copied from the floating point pipeline, but
+    use double precision instead of single precision.
+
+commit b29d74ef0c4164f4552da344723d3ae6f731011c
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Thu Dec 26 09:41:53 2013 -0500
+
+    configure.ac: Check and use -Wno-unused-local-typedefs GCC option
+    
+    With GCC 4.8.2 the COMPILE_TIME_ASSERT macro produces a spurious
+    warning about an unused local typedef:
+    
+        In file included from pixman.c:29:0:
+        pixman.c: In function 'optimize_operator':
+        pixman-private.h:1019:22: warning: typedef 'compile_time_assertion' locally defined but not used [-Wunused-local-typedefs]
+    
+    The flag -Wno-unused-local-typedefs suppresses that warning.
+
+commit 945ab7a6f3eb6241f07e8f094dc0e647d1f10d9d
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Tue Dec 3 17:59:42 2013 -0500
+
+    Soft Light: The first comparison should be <=, not <
+    
+    According to the definition of soft light, the first comparison is
+    less-than-or-equal, not less-than.
+
+commit 9ba3a34797399b286dbfe21c7b213a7547abf577
+Author: Søren Sandmann <ssp@redhat.com>
+Date:   Sat Nov 23 20:30:33 2013 -0500
+
+    general: Support component alpha for all image types
+    
+    Currently, if you attempt to use component alpha on source images or
+    images without RGB channels, Pixman will silently just use unified
+    alpha instead. This patch makes such images supported for component
+    alpha.
+    
+    There is no particularly compelling usecase at the moment, but this
+    patch does get rid of a bit of special-case code both in
+    pixman-general.c and in test/composite.c.
+
+commit f473fd1e7553a4e92a0d72bea360f05d005c9a88
 Author: Søren Sandmann <ssp@redhat.com>
 Date:   Sat Nov 16 18:57:01 2013 -0500
 
@@ -91,9 +2711,8 @@ Date:   Sat Nov 16 18:57:01 2013 -0500
     
     Reviewed-and-Tested-by: Matt Turner <mattst88@gmail.com>
     Bugzilla: https://bugs.gentoo.org/show_bug.cgi?id=491110
-    (cherry picked from commit f473fd1e7553a4e92a0d72bea360f05d005c9a88)
 
-commit 5a313af74e9afe7524909c019daebfded3bef1fa
+commit 8487dfbcd056eff066939dc253fcf361b391592a
 Author: Jakub Bogusz <qboosh@pld-linux.org>
 Date:   Tue Nov 12 12:59:42 2013 -0800
 
@@ -104,21 +2723,8 @@ Date:   Tue Nov 12 12:59:42 2013 -0800
     SSSE3.
     
     Reviewed-by: Matt Turner <mattst88@gmail.com>
-    (cherry picked from commit 8487dfbcd056eff066939dc253fcf361b391592a)
 
-commit 917a52003d0705ac0076bd1ed4e390374f56c262
-Author: Søren Sandmann <ssp@redhat.com>
-Date:   Mon Nov 11 19:55:18 2013 -0500
-
-    Post-release version bump to 0.32.3
-
-commit a980f83a6827109aad789d4c8c664f2770d0aaa1
-Author: Søren Sandmann <ssp@redhat.com>
-Date:   Mon Nov 11 19:44:54 2013 -0500
-
-    Pre-release version bump to 0.32.2
-
-commit e2e381702172abfd50b48a73cd183635e138ff99
+commit 741007311087be8a711cc9c76ec00e59a156c850
 Author: Søren Sandmann <ssp@redhat.com>
 Date:   Mon Nov 11 19:13:31 2013 -0500
 
@@ -131,7 +2737,7 @@ Date:   Mon Nov 11 19:13:31 2013 -0500
     
     Fixes https://bugs.freedesktop.org/show_bug.cgi?id=71465
 
-commit 950d1310f7c6db202a1a4eaf4761667968b81645
+commit 9bab46e9b8df1b061e993546414ed7d69e7b2058
 Author: Andrea Canciani <ranma42@gmail.com>
 Date:   Mon Nov 11 11:21:23 2013 +0100
 
@@ -140,11 +2746,11 @@ Date:   Mon Nov 11 11:21:23 2013 +0100
     The win32 build has no config.h, so HAVE_CONFIG_H should be checked
     before including it, as in utils.h.
 
-commit 7a00965d7aa861da39a781ea2df1b5f54c48dbb7
+commit ca5a4dec44afe5769e2ca99dbc7e5e66fa1fe272
 Author: Søren Sandmann <ssp@redhat.com>
-Date:   Mon Nov 11 19:07:19 2013 -0500
+Date:   Sun Nov 10 18:17:12 2013 -0500
 
-    Post-release version bump to 0.32.1
+    Post-release version bump to 0.33.1
 
 commit 895e7e05b7a51a8d578c523bf6c0c6649e06ab5e
 Author: Søren Sandmann <ssp@redhat.com>
