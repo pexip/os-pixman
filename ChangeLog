@@ -1,8 +1,565 @@
-commit 1727aa4ab60a594cbb1cc1bdaa270b7dfad21f06
-Author: Oded Gabbay <oded.gabbay@gmail.com>
-Date:   Sun Jan 31 16:39:23 2016 +0200
+commit 0313f35ab96365016264920c91035ea99dd0931f
+Author: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Date:   Wed Nov 21 12:40:21 2018 +0100
 
-    Pre-release version bump to 0.34.0
+    Bump version to 0.36.0
+    
+    Signed-off-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+
+commit 8a5d44c420f8a985532a5e22ac020219ef5141ad
+Author: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Date:   Wed Nov 21 12:39:11 2018 +0100
+
+    pixman: Update git repository to the one at gitlab.
+    
+    Signed-off-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+
+commit 489fa0df11eef83912932f7be881f35bbe0a1b93
+Author: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Date:   Wed Jul 11 12:10:41 2018 +0200
+
+    pixman: Add tests for (a)rgb floating point formats.
+    
+    Add some basic tests to ensure that the newly added formats work as
+    intended.
+    
+    Signed-off-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+    Reviewed-by: Chris Wilson <chris@chris-wilson.co.uk>
+
+commit a4b8a26d2b741e1b3a17b58d34b67bffa17bf15c
+Author: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Date:   Wed May 30 16:07:10 2018 +0200
+
+    pixman: Add support for argb/xrgb float formats, v5.
+    
+    Pixman is already using the floating point formats internally, expose
+    this capability in case someone wants to support higher bit per
+    component formats.
+    
+    This is useful for igt which depends on cairo to do the rendering.
+    It can use it to convert floats internally to planar Y'CbCr formats,
+    or to F16.
+    
+    We add a new type PIXMAN_TYPE_RGBA_FLOAT for this format, which is an
+    all float array of R, G, B, and A. Formats that use mixed float/int
+    RGBA aren't supported, and will probably need their own type.
+    
+    Changes since v1:
+    - Use RGBA 128 bits and RGB 96 bits memory layouts, to better match the opengl format.
+    Changes since v2:
+    - Add asserts in accessor and for strides to force alignment.
+    - Move test changes to their own commit.
+    Changes since v3:
+    - Define 32bpc as PIXMAN_FORMAT_PACKED_C32
+    - Rename pixman accessors from rgb*_float_float to rgb*f_float
+    Changes since v4:
+    - Create a new PIXMAN_FORMAT_BYTE for fitting up to 64 bits per component.
+      (based on Siarhei Siamashka's suggestion)
+    - Use new format type PIXMAN_TYPE_RGBA_FLOAT
+    
+    Signed-off-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+    Reviewed-by: Chris Wilson <chris@chris-wilson.co.uk> #v4
+    [mlankhorst: Fix missing braces in PIXMAN_FORMAT_RESHIFT macro]
+
+commit 018bf2f23033ea0c82df3e4cf48dbb330bec9414
+Author: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+Date:   Tue Jun 12 17:38:57 2018 +0300
+
+    test: Fix stride calculation in stress-test
+    
+    Currently the number of bits per pixel is used instead of the
+    number of bytes per pixel when calculating image strides. This
+    does not cause any real problems, but the gaps between scanlines
+    are excessively large.
+    
+    This patch actually converts bits to bytes and rounds up the result
+    to the nearest byte boundary.
+    
+    Signed-off-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+    Reviewed-by: soren.sandmann@gmail.com
+
+commit bd2b49185b28c5024597a5e530af9fc25de3193a
+Author: Vladimir Smirnov <civil@gentoo.org>
+Date:   Mon Jun 4 10:04:15 2018 -0700
+
+    test: Adjust for clang's removal of __builtin_shuffle
+    
+    __builtin_shuffle was removed in clang 5.0.
+    
+    Build log says:
+    test/utils-prng.c:207:27: error: use of unknown builtin '__builtin_shuffle' [-Wimplicit-function-declaration]
+                randdata.vb = __builtin_shuffle (randdata.vb, bswap_shufflemask);
+                              ^
+    test/utils-prng.c:207:25: error: assigning to 'uint8x16' (vector of 16 'uint8_t' values) from incompatible type 'int'
+                randdata.vb = __builtin_shuffle (randdata.vb, bswap_shufflemask);
+                            ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    2 errors generated
+    
+    Link to original discussion:
+    http://lists.llvm.org/pipermail/cfe-dev/2017-August/055140.html
+    
+    It's possible to build pixman if attached patch is applied. Basically
+    patch adds check for __builtin_shuffle support and in case there is
+    none, falls back to clang-specific __builtin_shufflevector that do the
+    same but have different API.
+    
+    Bugzilla: https://bugs.gentoo.org/646360
+    Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=104886
+    Tested-by: Philip Chimento <philip.chimento@gmail.com>
+    Reviewed-by: Matt Turner <mattst88@gmail.com>
+    Reviewed-by: Adam Jackson <ajax@redhat.com>
+
+commit a75c69f12221e77904a713471141dc15ce733481
+Merge: ddf42d6 9034d0c
+Author: Adam Jackson <ajax@nwnk.net>
+Date:   Tue Jun 5 16:33:50 2018 +0000
+
+    Merge branch 'ci' into 'master'
+    
+    ci: Add .gitlab-ci.yml
+    
+    See merge request pixman/pixman!1
+
+commit 9034d0cc3241c56cbe3bdbc98247a68e3529ee48
+Author: Adam Jackson <ajax@redhat.com>
+Date:   Thu May 31 12:32:18 2018 -0400
+
+    ci: Add .gitlab-ci.yml
+    
+    Just builds on Fedora 28 for x86_64 at the moment, but it's a start.
+    Credit to Daniel Stone for eliminating the nested docker image.
+    
+    Signed-off-by: Adam Jackson <ajax@redhat.com>
+
+commit ddf42d627c724ef5337ea86e1ac7ef24a5df8f37
+Author: Dan Horák <dan@danny.cz>
+Date:   Thu May 10 10:47:09 2018 -0400
+
+    vmx: Fix vector loads on ppc64le
+    
+    Use vector intrinsic for loading possibly unaligned data instead of a
+    typecast.
+    
+    Bugzilla: https://bugzilla.redhat.com/1572540
+    Signed-off-by: Dan Horák <dan@danny.cz>
+    Signed-off-by: Adam Jackson <ajax@redhat.com>
+    Tested-by: Matt Turner <mattst88@gmail.com>
+    Reviewed-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 8b95e0e460baa499e54c19d29bf761d34c25badc
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Tue Jan 9 10:26:29 2018 +0100
+
+    Promote unsigned short to unsigned int explicitly
+    
+    ...to avoid default promotion to signed int, which causes undefined
+    behaviour in the shift expression.
+
+commit 85467ec308f8621a5410c007491797b7b1847601
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Sat Sep 3 15:09:12 2016 -0400
+
+    Revert "demos/scale: Added pulldown to choose PIXMAN_FILTER_* value"
+    
+    This reverts commit 375f5ec5c5d2a6cc3586f57e36fdf08a3d0ac4e4.
+    
+    This patch was accidentally pushed.
+
+commit 17c4ce2e393af597db3c04295c21afc7ce34aa22
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:15 2016 -0700
+
+    pixman-filter: Made Gaussian a bit wider
+    
+    Expanded the size slightly (from ~4.25 to 5) to make the cutoff less
+    noticable.  Previouly the value at the cutoff was
+    gaussian_filter(sqrt(2)*3/2) = 0.00626 which is larger than the
+    difference between 8-bit pixels (1/255 = 0.003921). New cutoff is
+    gaussian_filter(2.5) = 0.001089 which is smaller.
+    
+    v11: added some math to commit message
+    v14: left SIGMA in there
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Acked-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit d286078b28bdef15aa0498e6e7ec7da68a42bfeb
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:14 2016 -0700
+
+    pixman-filter: Nested polynomial for cubic
+    
+    v11: Restored range checks
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 133142449b22fc2799d922479514e677ae91f0f5
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Fri Apr 8 22:32:30 2016 -0400
+
+    pixman-filter: Fix several issues related to normalization
+    
+    There are a few bugs in the current normalization code
+    
+    (1) The normalization is based on the sum of the *floating point*
+        values generated by integral(). But in order to get the sum to be
+        close to pixman_fixed_1, the sum of the rounded fixed point values
+        should be used.
+    
+    (2) The multiplications in the normalization loops often round the
+        same way, so the residual error can fairly large.
+    
+    (3) The residual error is added to the sample located at index
+        (width - width / 2), which is not the midpoint for odd widths (and
+        for width 1 is in fact outside the array).
+    
+    This patch fixes these issues by (1) using the sum of the fixed point
+    values as the total to divide by, (2) doing error diffusion in the
+    normalization loop, and (3) putting any residual error (which is now
+    guaranteed to be less than pixman_fixed_e) at the first sample, which
+    is the only one that didn't get any error diffused into it.
+    
+    Signed-off-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit 3b46fce6fec566e93a8a6b90df113272d203aafc
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Tue Aug 30 22:03:12 2016 -0700
+
+    pixman-filter: Speed up BOX/BOX filter
+    
+    The convolution of two BOX filters is simply the length of the
+    interval where both are non-zero, so we can simply return width from
+    the integral() function because the integration region has already
+    been restricted to be such that both functions are non-zero on it.
+    
+    This is both faster and more accurate than doing numerical integration.
+    
+    This patch is based on one by Bill Spitzak
+    
+        https://lists.freedesktop.org/archives/pixman/2016-March/004446.html
+    
+    with these changes:
+    
+    - Rebased to not assume any changes in the arguments to integral().
+    
+    - Dropped the multiplication by scale
+    
+    - Added more details in the commit message.
+    
+    Signed-off-by: Søren Sandmann <soren.sandmann@gmail.com>
+    Reviewed-by: Bill Spitzak <spitzak@gmail.com>
+
+commit 8855b3a2a231ab348c02c0d92f0051b079eabfa3
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:11 2016 -0700
+
+    pixman-filter: integral splitting is only needed for triangle filter
+    
+    Only the triangle is discontinuous at 0. The other filters resemble a
+    cubic closely enough that Simpsons integration works without
+    splitting.
+    
+    Changes by Søren: Rebase without the changes to the integral function,
+    update comment to match the new code.
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Signed-off-by: Søren Sandmann <soren.sandmann@gmail.com>
+    Reviewed-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit 6ae281fbb7a02b94a3900b6677a51cdd28096ed7
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:10 2016 -0700
+
+    pixman-filter: Correct Simpsons integration
+    
+    Simpsons uses cubic curve fitting, with 3 samples defining each
+    cubic. This makes the weights of the samples be in a pattern of
+    1,4,2,4,2...4,1, and then dividing the result by 3.
+    
+    The previous code was using weights of 1,2,0,6,0,6...,2,1.
+    
+    With this fix the integration is accurate enough that the number of
+    samples could be reduced a lot. Multiples of 12 seem to work best.
+    
+    v7: Merged with patch to reduce from 128 samples to 16
+    v9: Changed samples from 16 to 12
+    v10: Fixed rebase error that made it not compile
+    v11: minor whitespace change
+    v14: more whitespace changes
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit 6acaf2bcb1246529143c112dbce6dd9d6f7cb51e
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:09 2016 -0700
+
+    pixman-filter: reduce amount of malloc/free/memcpy to generate filter
+    
+    Rearranged so that the entire block of memory for the filter pair
+    is allocated first, and then filled in. Previous version allocated
+    and freed two temporary buffers for each filter and did an extra
+    memcpy.
+    
+    v8: small refactor to remove the filter_width function
+    
+    v10: Restored filter_width function but with arguments changed to
+         match later patches
+    
+    v11: Removed unused arg and pointer from filter_width function
+         Whitespace fixes.
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Acked-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit d0e6c9f4f65e429058b97d2f947b048b445c17c4
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:08 2016 -0700
+
+    pixman-image: Added enable-gnuplot config to view filters in gnuplot
+    
+    If enable-gnuplot is configured, then you can pipe the output of a
+    pixman-using program to gnuplot and get a continuously-updated plot of
+    the horizontal filter. This works well with demos/scale to test the
+    filter generation.
+    
+    The plot is all the different subposition filters shuffled
+    together. This is misleading in a few cases:
+    
+      IMPULSE.BOX - goes up and down as the subfilters have different
+                    numbers of non-zero samples
+    
+      IMPULSE.TRIANGLE - somewhat crooked for the same reason
+    
+      1-wide filters - looks triangular, but a 1-wide box would be more
+                       accurate
+    
+    Changes by Søren: Rewrote the pixman-filter.c part to
+         - make it generate correct coordinates
+         - add a comment on how coordinates are generated
+         - in rounding.txt, add a ceil() variant of the first-sample
+           formula
+         - make the gnuplot output slightly prettier
+    
+    v7: First time this ability was included
+    
+    v8: Use config option
+        Moved code to the filter generator
+        Modified scale demo to not call filter generator a second time.
+    
+    v10: Only print if successful generation of plots
+         Use #ifdef, not #if
+    
+    v11: small whitespace fixes
+    v12: output range from -width/2 to width/2 and include y==0, to avoid misleading plots
+         for subsample_bits==0 and for box filters which may have no small values.
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+
+commit 375f5ec5c5d2a6cc3586f57e36fdf08a3d0ac4e4
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:07 2016 -0700
+
+    demos/scale: Added pulldown to choose PIXMAN_FILTER_* value
+    
+    This is very useful for comparing the results of SEPARABLE_CONVOLUTION
+    with BILINEAR and NEAREST.
+    
+    v14: Removed good/best items
+    v15: Skip filter generation so gnuplot output continues showing previous value
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit afee2adc1e0052795a6ca8195e09a597bebde834
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:06 2016 -0700
+
+    demos/scale: Default to locked axis
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit 1e1af34d3b74808d08a4067ff9d093a020e25da5
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:05 2016 -0700
+
+    demos/scale: fix blank subsamples spin box
+    
+    It now shows the initial value of 4 when the demo is started
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Søren Sandmann <soren.sandmann@gmail.com>
+
+commit 99b574109dabff9c3c6fa9296b3b0534411b6fdb
+Author: Bill Spitzak <spitzak@gmail.com>
+Date:   Tue Aug 30 22:03:04 2016 -0700
+
+    demos/scale: Compute filter size using boundary of xformed ellipse
+    
+    Instead of using the boundary of xformed rectangle, use the boundary
+    of xformed ellipse. This is much more accurate and less blurry. In
+    particular the filtering does not change as the image is rotated.
+    
+    Signed-off-by: Bill Spitzak <spitzak@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+    Reviewed-by: Soren Sandmann <soren.sandmann@gmail.com>
+
+commit b9ead7ddf7c2bb373808e59a4f625e2e732ef2e2
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Tue Aug 30 22:03:03 2016 -0700
+
+    More general BILINEAR=>NEAREST reduction
+    
+    Generalize and simplify the code that reduces BILINEAR to NEAREST so
+    that the reduction happens for all affine transformations where
+    t00...t12 are integers and (t00 + t01) and (t10 + t11) are both
+    odd. This is a sufficient condition for the resulting transformed
+    coordinates to be exactly at the center of a pixel so that BILINEAR
+    becomes identical to NEAREST.
+    
+    V2: Address some comments by Bill Spitzak
+    
+    Signed-off-by: Søren Sandmann <soren.sandmann@gmail.com>
+    Reviewed-by: Bill Spitzak <spitzak@gmail.com>
+
+commit 76123690139a7f342776a885a7478a6c81712145
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Tue Aug 30 22:03:02 2016 -0700
+
+    Add new test of filter reduction from BILINEAR to NEAREST
+    
+    This new test tests a bunch of bilinear downscalings, where many have
+    a transformation such that the BILINEAR filter can be reduced to
+    NEAREST (and many don't).
+    
+    A CRC32 is computed for all the resulting images and compared to a
+    known-good value for both 4-bit and 7-bit interpolation.
+    
+    V2: Remove leftover comment, some minor formatting fixes, use a
+    timestamp as the PRNG seed.
+    
+    Signed-off-by: Søren Sandmann <soren.sandmann@gmail.com>
+    Reviewed-by: Bill Spitzak <spitzak@gmail.com>
+
+commit eb4a832ec22e4257b59cac752b02a1d27f4363bc
+Author: Søren Sandmann Pedersen <soren.sandmann@gmail.com>
+Date:   Tue Aug 30 22:03:01 2016 -0700
+
+    pixman-fast-path.c: Pick NEAREST affine fast paths before BILINEAR ones
+    
+    When a BILINEAR filter is reduced to NEAREST, it is possible for both
+    types of fast paths to run; in this case, the NEAREST ones should be
+    preferred as that is the simpler filter.
+    
+    Signed-off-by: Soren Sandmann <soren.sandmann@gmail.com>
+    Reviewed-by: Bill Spitzak <spitzak@gmail.com>
+
+commit 7c6066b700c7cdd4aeb8be426b14b3a5f0de4b6c
+Author: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Date:   Sun Jan 17 15:22:50 2016 +0100
+
+    pixman-private: include <float.h> only in C code
+    
+    <float.h> is included unconditionally by pixman-private.h, which in
+    turn gets included by assembler files. Unfortunately, with certain C
+    libraries (like the musl C library), <float.h> cannot be included in
+    assembler files:
+    
+      CCLD     libpixman-arm-simd.la
+    /home/test/buildroot/output/host/usr/arm-buildroot-linux-musleabihf/sysroot/usr/include/float.h: Assembler messages:
+    /home/test/buildroot/output/host/usr/arm-buildroot-linux-musleabihf/sysroot/usr/include/float.h:8: Error: bad instruction `int __flt_rounds(void)'
+    /home/test/buildroot/output/host/usr/arm-buildroot-linux-musleabihf/sysroot/usr/include/float.h: Assembler messages:
+    /home/test/buildroot/output/host/usr/arm-buildroot-linux-musleabihf/sysroot/usr/include/float.h:8: Error: bad instruction `int __flt_rounds(void)'
+    
+    It turns out however that <float.h> is not needed by assembly files,
+    so we move its inclusion within the #ifndef __ASSEMBLER__ condition,
+    which solves the problem.
+    
+    Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+    Reviewed-by: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+
+commit 342cbf1644125919c51ab099e434951429e66411
+Author: Andrea Canciani <ranma42@gmail.com>
+Date:   Wed Dec 23 23:22:02 2015 +0100
+
+    build: Distinguish SKIP and FAIL on Win32
+    
+    The `check` target in test/Makefile.win32 assumed that any non-0 exit
+    code from the tests was an error, but the testsuite is currently using
+    77 as a SKIP exit code (based on the convention used in autotools).
+    
+    Fixes fence-image-self-test and cover-test (now reported as SKIP).
+    
+    Signed-off-by: Andrea Canciani <ranma42@gmail.com>
+    Acked-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit af0689716a011de3645aaefc57138c9d1d0e3ae6
+Author: Simon Richter <Simon.Richter@hogyros.de>
+Date:   Tue Dec 22 22:45:33 2015 +0100
+
+    build: Use `del` instead of `rm` on `cmd.exe` shells
+    
+    The `rm` command is not usually available when running on Win32 in a
+    `cmd.exe` shell. Instead the shell provides the `del` builtin, which
+    has somewhat more limited wildcars expansion and error handling.
+    
+    This makes all of the Makefile targets work on Win32 both using
+    `cmd.exe` and using the MSYS environment.
+    
+    Signed-off-by: Simon Richter <Simon.Richter@hogyros.de>
+    Signed-off-by: Andrea Canciani <ranma42@gmail.com>
+    Acked-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit 93b876c11063f58c87fd93ed41e4d3f483bf59ab
+Author: Andrea Canciani <ranma42@gmail.com>
+Date:   Tue Dec 22 22:46:05 2015 +0100
+
+    build: Do not use `mkdir -p` on Windows
+    
+    When the build is performed using `cmd.exe` as shell, the `mkdir`
+    command does not support the `-p` flag. The ability to create multiple
+    netsted folder is not used, hence it can be easily replaced by only
+    creating the directory if it does not exist.
+    
+    This makes the build work on the `cmd.exe` shell, except for the
+    `clean` targets.
+    
+    Signed-off-by: Andrea Canciani <ranma42@gmail.com>
+    Acked-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit cc35d01980df2e2d686568ef7f1216bcc809b5aa
+Author: Andrea Canciani <ranma42@gmail.com>
+Date:   Wed Dec 23 11:15:59 2015 +0100
+
+    build: Avoid phony `pixman` target in test/Makefile.win32
+    
+    Instead of explicitly depending on "pixman" for the "all" and "check"
+    targets, rely on the dependency to the .lib file
+    
+    Signed-off-by: Andrea Canciani <ranma42@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit ceb49cbda93a59bf41a5a9908114534208f8250c
+Author: Andrea Canciani <ranma42@gmail.com>
+Date:   Tue Dec 22 21:53:14 2015 +0100
+
+    build: Remove use of BUILT_SOURCES from Makefile.win32
+    
+    Since 3d81d89c292058522cce91338028d9b4c4a23c24 BUILT_SOURCES is not
+    used anymore, but it was unintentionally left in Win32 Makefiles.
+    
+    Signed-off-by: Andrea Canciani <ranma42@gmail.com>
+    Reviewed-by: Oded Gabbay <oded.gabbay@gmail.com>
+
+commit ba1868a854b1a2073bc44c1074596bd9a8891245
+Author: Oded Gabbay <oded.gabbay@gmail.com>
+Date:   Wed Dec 23 10:46:40 2015 +0200
+
+    Post 0.34 branch creation version bump to 0.35.1
     
     Signed-off-by: Oded Gabbay <oded.gabbay@gmail.com>
 
