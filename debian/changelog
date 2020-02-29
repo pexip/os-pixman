@@ -1,3 +1,9 @@
+pixman (0.36.0-1pexip1) pexip; urgency=medium
+
+  * Migrate to Buster
+
+ -- Vincent Sanders <vince@pexip.com>  Sat, 29 Feb 2020 21:25:54 +0000
+
 pixman (0.36.0-1) unstable; urgency=medium
 
   * New upstream release.
