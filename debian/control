@@ -3,15 +3,14 @@ Section: devel
 Priority: optional
 Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
-XSBC-Pexip-Original-Uploaders: Andreas Boll <andreas.boll.dev@gmail.com>
+XSBC-Pexip-Original-Uploaders: Andreas Boll <aboll@debian.org>
 Build-Depends:
- debhelper (>= 9),
- dh-autoreconf,
+ debhelper (>= 11),
  pkg-config,
  quilt,
-Standards-Version: 3.9.6
-Vcs-Git: https://anonscm.debian.org/git/pkg-xorg/lib/pixman.git
-Vcs-Browser: https://anonscm.debian.org/cgit/pkg-xorg/lib/pixman.git
+Standards-Version: 4.2.1
+Vcs-Git: https://salsa.debian.org/xorg-team/lib/pixman.git
+Vcs-Browser: https://salsa.debian.org/xorg-team/lib/pixman
 Homepage: http://pixman.org/
 XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
 
@@ -40,24 +39,13 @@ Description: pixel-manipulation library for X and cairo
  This package contains a minimal set of libraries needed for the Debian
  installer.  Do not install it on a normal system.
 
-Package: libpixman-1-0-dbg
-Section: debug
-Priority: extra
-Architecture: any
-Depends:
- libpixman-1-0 (= ${binary:Version}),
- ${misc:Depends},
-Multi-Arch: same
-Description: pixel-manipulation library for X and cairo (debugging symbols)
- Debugging symbols for the Cairo/X pixel manipulation library.  This is
- needed to debug programs linked against libpixman0.
-
 Package: libpixman-1-dev
 Section: libdevel
 Architecture: any
 Depends:
  libpixman-1-0 (= ${binary:Version}),
  ${misc:Depends},
+Multi-Arch: same
 Description: pixel-manipulation library for X and cairo (development files)
  Development libraries, header files and documentation needed by
  programs that want to compile with the Cairo/X pixman library.

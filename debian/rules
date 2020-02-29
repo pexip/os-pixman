@@ -10,7 +10,6 @@ override_dh_auto_configure:
 	# also avoid loongson2f optimizations on mipsel, see 0.26.0-3
 	# changelog entry:
 	LS_CFLAGS=" " dh_auto_configure -- --disable-gtk \
-	  --disable-silent-rules \
 	  --disable-arm-iwmmxt
 
 # Install in debian/tmp to retain control through dh_install:
@@ -24,7 +23,7 @@ override_dh_install:
 
 # Debug package:
 override_dh_strip:
-	dh_strip -p$(PACKAGE) --dbg-package=$(PACKAGE)-dbg
+	dh_strip -p$(PACKAGE) --dbgsym-migration="$(PACKAGE)-dbg (<< 0.34.0-2~)"
 	dh_strip -N$(PACKAGE)
 
 # Shlibs:
@@ -35,4 +34,4 @@ override_dh_auto_test:
 	dh_auto_test -- VERBOSE=1
 
 %:
-	dh $@ --with quilt,autoreconf --builddirectory=build/ --parallel
+	dh $@ --with quilt --builddirectory=build/
