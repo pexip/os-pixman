@@ -1,3 +1,11 @@
+pixman (0.40.0-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #958298, #832579, #838650)
+  * control, rules: Migrate to debhelper-compat, bump to 13.
+  * symbols: Updated, bump shlibs.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Thu, 03 Dec 2020 15:28:13 +0200
+
 pixman (0.36.0-1) unstable; urgency=medium
 
   * New upstream release.

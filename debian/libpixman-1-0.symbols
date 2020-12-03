@@ -64,6 +64,8 @@ libpixman-1.so.0 libpixman-1-0 #MINVER#
  pixman_image_set_clip_region@Base 0
  pixman_image_set_component_alpha@Base 0
  pixman_image_set_destroy_function@Base 0.15.12
+ pixman_image_set_dither@Base 0.40.0
+ pixman_image_set_dither_offset@Base 0.40.0
  pixman_image_set_filter@Base 0.30.0
  pixman_image_set_has_client_clip@Base 0
  pixman_image_set_indexed@Base 0
