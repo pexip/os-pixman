@@ -226,9 +226,9 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-DIST_ARCHIVES = $(distdir).tar.gz $(distdir).tar.bz2
+DIST_ARCHIVES = $(distdir).tar.gz $(distdir).tar.xz
 GZIP_ENV = --best
-DIST_TARGETS = dist-bzip2 dist-gzip
+DIST_TARGETS = dist-xz dist-gzip
 distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
@@ -373,7 +373,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -390,23 +389,28 @@ USERNAME = $$USER
 RELEASE_OR_SNAPSHOT = $$(if test "x$(PIXMAN_VERSION_MINOR)" = "x$$(echo "$(PIXMAN_VERSION_MINOR)/2*2" | bc)" ; then echo release; else echo snapshot; fi)
 RELEASE_CAIRO_HOST = $(USERNAME)@cairographics.org
 RELEASE_CAIRO_DIR = /srv/cairo.freedesktop.org/www/$(RELEASE_OR_SNAPSHOT)s
-RELEASE_CAIRO_URL = http://cairographics.org/$(RELEASE_OR_SNAPSHOT)s
-RELEASE_XORG_URL = http://xorg.freedesktop.org/archive/individual/lib
+RELEASE_CAIRO_URL = https://cairographics.org/$(RELEASE_OR_SNAPSHOT)s
+RELEASE_XORG_URL = https://www.x.org/releases/individual/lib
 RELEASE_XORG_HOST = $(USERNAME)@xorg.freedesktop.org
 RELEASE_XORG_DIR = /srv/xorg.freedesktop.org/archive/individual/lib
 RELEASE_ANNOUNCE_LIST = cairo-announce@cairographics.org, xorg-announce@lists.freedesktop.org, pixman@lists.freedesktop.org
 EXTRA_DIST = \
 	Makefile.win32			\
-	Makefile.win32.common
+	Makefile.win32.common		\
+	meson.build			\
+	meson_options.txt		\
+	neon-test.S			\
+	arm-simd-test.S			\
+	$(NULL)
 
 tar_gz = $(PACKAGE)-$(VERSION).tar.gz
-tar_bz2 = $(PACKAGE)-$(VERSION).tar.bz2
-sha1_tgz = $(tar_gz).sha1
-md5_tgz = $(tar_gz).md5
-sha1_tbz2 = $(tar_bz2).sha1
-md5_tbz2 = $(tar_bz2).md5
-gpg_file = $(sha1_tgz).asc
-HASHFILES = $(sha1_tgz) $(sha1_tbz2) $(md5_tgz) $(md5_tbz2)
+tar_xz = $(PACKAGE)-$(VERSION).tar.xz
+sha512_tgz = $(tar_gz).sha512
+sha256_tgz = $(tar_gz).sha256
+sha512_txz = $(tar_xz).sha512
+sha256_txz = $(tar_xz).sha256
+gpg_file = $(sha512_tgz).asc
+HASHFILES = $(sha512_tgz) $(sha512_txz) $(sha256_tgz) $(sha256_txz)
 RELEASE_TYPE = $$(if test "x$(PIXMAN_VERSION_MINOR)" = "x$$(echo "$(PIXMAN_VERSION_MINOR)/2*2" | bc)" ; then echo "stable release in the" ; else echo "development snapshot leading up to a stable"; fi)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -671,6 +675,7 @@ distdir-am: $(DISTFILES)
 dist-gzip: distdir
 	tardir=$(distdir) && $(am__tar) | eval GZIP= gzip $(GZIP_ENV) -c >$(distdir).tar.gz
 	$(am__post_remove_distdir)
+
 dist-bzip2: distdir
 	tardir=$(distdir) && $(am__tar) | BZIP2=$${BZIP2--9} bzip2 -c >$(distdir).tar.bz2
 	$(am__post_remove_distdir)
@@ -678,7 +683,6 @@ dist-bzip2: distdir
 dist-lzip: distdir
 	tardir=$(distdir) && $(am__tar) | lzip -c $${LZIP_OPT--9} >$(distdir).tar.lz
 	$(am__post_remove_distdir)
-
 dist-xz: distdir
 	tardir=$(distdir) && $(am__tar) | XZ_OPT=$${XZ_OPT--e} xz -c >$(distdir).tar.xz
 	$(am__post_remove_distdir)
@@ -928,19 +932,19 @@ snapshot:
 	test -d "$(srcdir)/.git" && distdir=$$distdir-`cd "$(srcdir)" && git rev-parse HEAD | cut -c 1-6`; \
 	$(MAKE) $(AM_MAKEFLAGS) distdir="$$distdir" dist
 
-$(sha1_tgz): $(tar_gz)
-	sha1sum $^ > $@
+$(sha512_tgz): $(tar_gz)
+	sha512sum $^ > $@
 
-$(md5_tgz): $(tar_gz)
-	md5sum $^ > $@
+$(sha256_tgz): $(tar_gz)
+	sha256sum $^ > $@
 
-$(sha1_tbz2): $(tar_bz2)
-	sha1sum $^ > $@
+$(sha512_txz): $(tar_xz)
+	sha512sum $^ > $@
 
-$(md5_tbz2): $(tar_bz2)
-	md5sum $^ > $@
+$(sha256_txz): $(tar_xz)
+	sha256sum $^ > $@
 
-$(gpg_file): $(sha1_tgz)
+$(gpg_file): $(sha512_tgz)
 	@echo "Please enter your GPG password to sign the checksum."
 	gpg --armor --sign $^ 
 
@@ -957,7 +961,7 @@ release-verify-newer:
 	@echo "Good."
 
 release-remove-old:
-	$(RM) $(tar_gz) $(tar_bz2) $(HASHFILES) $(gpg_file)
+	$(RM) $(tar_gz) $(tar_xz) $(HASHFILES) $(gpg_file)
 
 ensure-prev:
 	@if [[ "$(PREV)" == "" ]]; then							\
@@ -976,9 +980,9 @@ release-check: ensure-prev release-verify-newer release-remove-old distcheck
 release-tag:
 	git tag -u $(GPGKEY) -m "$(PACKAGE) $(VERSION) release" $(PACKAGE)-$(VERSION)
 
-release-upload: release-check $(tar_gz) $(tar_bz2) $(sha1_tgz) $(sha1_tbz2) $(md5_tgz) $(gpg_file)
-	scp $(tar_gz) $(sha1_tgz) $(gpg_file) $(RELEASE_CAIRO_HOST):$(RELEASE_CAIRO_DIR)
-	scp $(tar_gz) $(tar_bz2) $(RELEASE_XORG_HOST):$(RELEASE_XORG_DIR)
+release-upload: release-check $(tar_gz) $(tar_xz) $(sha512_tgz) $(sha512_txz) $(sha256_tgz) $(gpg_file)
+	scp $(tar_gz) $(sha512_tgz) $(gpg_file) $(RELEASE_CAIRO_HOST):$(RELEASE_CAIRO_DIR)
+	scp $(tar_gz) $(tar_xz) $(RELEASE_XORG_HOST):$(RELEASE_XORG_DIR)
 	ssh $(RELEASE_CAIRO_HOST) "rm -f $(RELEASE_CAIRO_DIR)/LATEST-$(PACKAGE)-[0-9]* && ln -s $(tar_gz) $(RELEASE_CAIRO_DIR)/LATEST-$(PACKAGE)-$(VERSION)"
 
 release-publish-message: $(HASHFILES) ensure-prev
@@ -994,18 +998,18 @@ release-publish-message: $(HASHFILES) ensure-prev
 	@echo "	$(RELEASE_CAIRO_URL)/$(tar_gz)"
 	@echo "	$(RELEASE_XORG_URL)/$(tar_gz)"
 	@echo ""
-	@echo "tar.bz2:"
-	@echo "	$(RELEASE_XORG_URL)/$(tar_bz2)"
+	@echo "tar.xz:"
+	@echo "	$(RELEASE_XORG_URL)/$(tar_xz)"
 	@echo ""
 	@echo "Hashes:"
-	@echo -n "	MD5:  "
-	@cat $(md5_tgz)
-	@echo -n "	MD5:  "
-	@cat $(md5_tbz2)
-	@echo -n "	SHA1: "
-	@cat $(sha1_tgz)
-	@echo -n "	SHA1: "
-	@cat $(sha1_tbz2)
+	@echo -n "	SHA256: "
+	@cat $(sha256_tgz)
+	@echo -n "	SHA256: "
+	@cat $(sha256_txz)
+	@echo -n "	SHA512: "
+	@cat $(sha512_tgz)
+	@echo -n "	SHA512: "
+	@cat $(sha512_txz)
 	@echo ""
 	@echo "GPG signature:"
 	@echo "	$(RELEASE_CAIRO_URL)/$(gpg_file)"
