@@ -12,7 +12,7 @@ Standards-Version: 4.2.1
 Vcs-Git: https://salsa.debian.org/xorg-team/lib/pixman.git
 Vcs-Browser: https://salsa.debian.org/xorg-team/lib/pixman
 Homepage: http://pixman.org/
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
+XS-Pexip-Upstream: http://deb.debian.org/debian/ bullseye
 
 Package: libpixman-1-0
 Section: libs
