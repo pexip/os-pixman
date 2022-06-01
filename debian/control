@@ -5,7 +5,7 @@ Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
 XSBC-Pexip-Original-Uploaders: Andreas Boll <aboll@debian.org>
 Build-Depends:
- debhelper (>= 11),
+ debhelper-compat (= 13),
  pkg-config,
  quilt,
 Standards-Version: 4.2.1

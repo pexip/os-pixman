@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 PACKAGE = libpixman-1-0
-SHLIBS  = 0.25.2
+SHLIBS  = 0.40.0
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
@@ -19,7 +19,7 @@ override_dh_auto_install:
 # Kill *.la files, and forget no-one:
 override_dh_install:
 	find debian/tmp -name '*.la' -delete
-	dh_install --fail-missing
+	dh_install
 
 # Debug package:
 override_dh_strip:
