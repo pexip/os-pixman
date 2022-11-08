@@ -1,3 +1,18 @@
+pixman (0.40.0-1.1~deb11u1) bullseye-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Rebuild for bullseye-security.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Tue, 08 Nov 2022 23:11:38 +0100
+
+pixman (0.40.0-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Avoid integer overflow leading to out-of-bounds write (CVE-2022-44638)
+    (Closes: #1023427)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 03 Nov 2022 23:07:46 +0100
+
 pixman (0.40.0-1) unstable; urgency=medium
 
   * New upstream release. (Closes: #958298, #832579, #838650)
