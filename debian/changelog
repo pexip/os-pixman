@@ -1,9 +1,10 @@
-pixman (0.40.0-1.1~deb11u1) bullseye-security; urgency=high
+pixman (0.42.2-1) unstable; urgency=medium
 
-  * Non-maintainer upload by the Security Team.
-  * Rebuild for bullseye-security.
+  * New upstream release.
+  * d/p/Avoid-integer-overflow-leading-to-out-of-bounds-writ.diff:
+    - Removed, fixed upstream.
 
- -- Salvatore Bonaccorso <carnil@debian.org>  Tue, 08 Nov 2022 23:11:38 +0100
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 11 Nov 2022 13:42:25 +0100
 
 pixman (0.40.0-1.1) unstable; urgency=medium
 
