@@ -1,3 +1,24 @@
+pixman (0.40.0-1.1~deb11u1pexip1) pexip; urgency=medium
+
+  * New upstream version with security updates
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 14 Nov 2022 12:19:52 +0100
+
+pixman (0.40.0-1.1~deb11u1) bullseye-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Rebuild for bullseye-security.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Tue, 08 Nov 2022 23:11:38 +0100
+
+pixman (0.40.0-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Avoid integer overflow leading to out-of-bounds write (CVE-2022-44638)
+    (Closes: #1023427)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Thu, 03 Nov 2022 23:07:46 +0100
+
 pixman (0.40.0-1pexip3) pexip-bullseye; urgency=medium
 
   * Bullseye rebuild for ARM64 inclusion
