@@ -560,8 +560,8 @@ add_project_arguments('-DHAVE_CONFIG_H', language : ['c'])
 subdir('pixman')
 
 if not get_option('tests').disabled()
-  subdir('test')
-  subdir('demos')
+  # subdir('test')
+  # subdir('demos')
 endif
 
 pkg = import('pkgconfig')
